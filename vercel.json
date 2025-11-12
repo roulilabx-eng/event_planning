@@ -1,0 +1,15 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "git clone https://github.com/flutter/flutter.git -b stable && export PATH=$PATH:`pwd`/flutter/bin && flutter --version && flutter pub get && flutter build web --release",
+        "outputDirectory": "build/web"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/build/web/$1" }
+  ]
+}

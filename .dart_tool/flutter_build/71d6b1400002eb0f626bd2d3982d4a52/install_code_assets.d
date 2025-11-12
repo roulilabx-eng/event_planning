@@ -1,0 +1,1 @@
+ /Users/rolling/Documents/developer/flutter/event_planning/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/native_assets.json: 
