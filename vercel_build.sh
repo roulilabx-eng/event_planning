@@ -1,19 +1,12 @@
 #!/bin/bash
+set -e
+echo "🚀 Start Flutter build for Web"
 
-# Step 1. 下載 Flutter SDK
-echo "Downloading Flutter SDK..."
-git clone https://github.com/flutter/flutter.git -b stable
-
-# Step 2. 設定 Flutter 路徑
+git clone https://github.com/flutter/flutter.git -b stable --depth 1
 export PATH="$PATH:`pwd`/flutter/bin"
 
-# Step 3. 驗證版本
 flutter --version
-
-# Step 4. 取得套件
 flutter pub get
-
-# Step 5. 建置 Web release 版本，確保 base href 正確
 flutter build web --release --base-href "/"
 
 echo "✅ Flutter Web build completed!"
