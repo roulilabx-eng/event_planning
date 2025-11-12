@@ -1,12 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "vercel_build.sh",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build/web" }
-    }
-  ],
+  "buildCommand": "bash vercel_build.sh",
+  "outputDirectory": "build/web",
   "routes": [
     { "src": "/(.*)", "dest": "/index.html" }
   ]
