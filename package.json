@@ -2,6 +2,6 @@
   "name": "flutter_web_demo",
   "version": "1.0.0",
   "scripts": {
-    "build": "bash vercel_build.sh"
+    "build": "./vercel_build.sh"
   }
 }
