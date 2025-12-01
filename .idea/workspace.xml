@@ -5,10 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c0866e8-2935-4139-a39c-81e6fa4e91ff" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/.filecache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/app.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/kernel_snapshot_program.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/71d6b1400002eb0f626bd2d3982d4a52/kernel_snapshot_program.stamp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vercel_build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/vercel_build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/8b4cf81de84a583e75d42b6312dbb4bb.cache.dill.track.dill" beforeDir="false" afterPath="$PROJECT_DIR$/build/8b4cf81de84a583e75d42b6312dbb4bb.cache.dill.track.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/macos/info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/build/macos/info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Runner/DebugProfile.entitlements" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Runner/DebugProfile.entitlements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Runner/Release.entitlements" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Runner/Release.entitlements" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
