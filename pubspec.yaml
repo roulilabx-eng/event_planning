@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   supabase_flutter: ^2.3.4
   cupertino_icons: ^1.0.8
+  just_audio: ^0.9.39
 
 
 dev_dependencies:
@@ -58,6 +59,13 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/audio/jingle_bells.mp3
+    - assets/audio/silent_night.mp3
+    - assets/audio/deck_the_halls.mp3
+    - assets/audio/we_wish_you.mp3
+    - assets/audio/frosty_the_snowman.mp3
 
   # To add assets to your application, add an assets section, like this:
   # assets:

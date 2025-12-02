@@ -23,10 +23,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			TloCWQXZtYrBc60rAAcaedKKO+8=
+			LKVgObPO6mdgmH0xEoGeWRcJgBg=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"4e5a025905d9b58ac173ad2b00071a79d28a3bef"</string>
+			<string>cdhash H"2ca56039b3ceea6760987d3112819e5917098018"</string>
 		</dict>
 		<key>Frameworks/FlutterMacOS.framework</key>
 		<dict>
@@ -45,6 +45,24 @@
 			</data>
 			<key>requirement</key>
 			<string>cdhash H"589d5f5669965f956646117839117133e32849d6"</string>
+		</dict>
+		<key>Frameworks/audio_session.framework</key>
+		<dict>
+			<key>cdhash</key>
+			<data>
+			TXguFYVD33wPQK/QrUvaPOsy908=
+			</data>
+			<key>requirement</key>
+			<string>cdhash H"4d782e158543df7c0f40afd0ad4bda3ceb32f74f"</string>
+		</dict>
+		<key>Frameworks/just_audio.framework</key>
+		<dict>
+			<key>cdhash</key>
+			<data>
+			9kUH2MVMo8bUbcIeb9D5Fe/ud3g=
+			</data>
+			<key>requirement</key>
+			<string>cdhash H"f64507d8c54ca3c6d46dc21e6fd0f915efee7778"</string>
 		</dict>
 		<key>Frameworks/path_provider_foundation.framework</key>
 		<dict>
@@ -86,10 +104,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			CBBEx0E487OSM1an58tv/2AlYcc=
+			wy3CA0ynScsYPMGzdrT6aLZ8oMU=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"081044c74138f3b3923356a7e7cb6fff602561c7"</string>
+			<string>cdhash H"c32dc2034ca749cb183cc1b376b4fa68b67ca0c5"</string>
 		</dict>
 		<key>Resources/AppIcon.icns</key>
 		<dict>

@@ -10,11 +10,11 @@
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.bin</key>
 		<data>
-		ME0cAg6cl/bTZmwXEVgMugDccUI=
+		Q5q4EIcWUY1UZijBDtdEHVy1Yuk=
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<data>
-		oG5/OGn+vw7vp/nu5DUDoZJ4nFc=
+		iYfaYum/f4ZYm2eG0Um6bM/zrg0=
 		</data>
 		<key>Resources/flutter_assets/FontManifest.json</key>
 		<data>
@@ -22,11 +22,31 @@
 		</data>
 		<key>Resources/flutter_assets/NOTICES.Z</key>
 		<data>
-		PjHYoDz5yw9zWlPv56A71wyoMJE=
+		xWM/we9uFvjweo44ERub1F1JoNA=
 		</data>
 		<key>Resources/flutter_assets/NativeAssetsManifest.json</key>
 		<data>
 		re4p7E8rPLLsN+wzaPN/+AVpXTY=
+		</data>
+		<key>Resources/flutter_assets/assets/audio/deck_the_halls.mp3</key>
+		<data>
+		Gib9IIdiDYlCMPURT+mFirBWYfA=
+		</data>
+		<key>Resources/flutter_assets/assets/audio/frosty_the_snowman.mp3</key>
+		<data>
+		KTE7rvvkBbjri7Fago6eRz3+/4A=
+		</data>
+		<key>Resources/flutter_assets/assets/audio/jingle_bells.mp3</key>
+		<data>
+		sflfUjmK/KAEdBQOjwFEkvrtDxI=
+		</data>
+		<key>Resources/flutter_assets/assets/audio/silent_night.mp3</key>
+		<data>
+		y87Fm8J5qcvuQfLlyXRjimuLA+M=
+		</data>
+		<key>Resources/flutter_assets/assets/audio/we_wish_you.mp3</key>
+		<data>
+		9VasaSnCEBl5xMkYpL+b3SOLFPQ=
 		</data>
 		<key>Resources/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
 		<data>
@@ -38,7 +58,7 @@
 		</data>
 		<key>Resources/flutter_assets/kernel_blob.bin</key>
 		<data>
-		UXVdiYezoVzF92TftgW8bSfix9Y=
+		3uhm0aRfqofxXqy5d59zv++zHgU=
 		</data>
 		<key>Resources/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -66,14 +86,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			AK9VrT1vIYmP534P8JLRoc2lLJQbaGDpko1FyK+MCV0=
+			Aw8BL59l9pG9fXdgWQj66rYsCmn+4xlGi62qclNWx4w=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Sps95+7JukayebvM0TLjL1LW1VXXndpKp/O8tOm9ZR8=
+			lYm3b2LABZqZHMSoPM5cefAGM/QgPdCYwJOsE1uMFxw=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/FontManifest.json</key>
@@ -87,7 +107,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			1mzJ3JuH4faAvBZjW8qvtpjN+68fMSIb5cRmI6cjxV4=
+			uJYVKiF6NuCO2v0AsVNmHOGpxTesu1QPXVsqp9qDFms=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/NativeAssetsManifest.json</key>
@@ -95,6 +115,41 @@
 			<key>hash2</key>
 			<data>
 			lUijHkoEgTXB2U+Rkyi/tirix7s8q5ZVfHlB2ql3dss=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/audio/deck_the_halls.mp3</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			P/BcMS0HqhN5RdyLRhcndyOQJhTOufMZ14F9EUtl7pQ=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/audio/frosty_the_snowman.mp3</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			k4jgj/Zt4RA2PnJeq4pHUQxttMOal0RdzFtrRb3B/R8=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/audio/jingle_bells.mp3</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			WOq+0BP3nIBurVvM0zCk68xmGPylQs1V98z1xWSlN+M=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/audio/silent_night.mp3</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			25wn6hwVT2+fEGvB8E4gTlYAqlD8Z1ljbM2cBMXLoOg=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/audio/we_wish_you.mp3</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nJNmgepJ1uCGx04/v78rwhzTd5jHkS5MCLD0GyQ+kYU=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
@@ -115,7 +170,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			E9NQ7rjzXITHyCR07394DYIYKhmne1PrN/+blt+KhXs=
+			gT3KZGC1Q2LVZcfVJ3MihZTDQvsb68NFApeTwxrQAQY=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
