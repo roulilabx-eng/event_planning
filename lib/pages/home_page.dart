@@ -16,7 +16,6 @@ import '../widgets/countdown_widget.dart' show defaultEventTime;
 class EventData {
   // --- Strings ---
   final String mainTitle = '🎁 聖誕 Ｘ 猜謎 Ｘ 交換禮物 🎁';
-  final String welcomeMessage = '歡迎您，'; // 用於身份驗證後
 
   final String infoTitle1 = '🎄 活動資訊 🎄';
   final String infoTheme = '主題｜再不猜謎就瘋狂：身體小小、頭腦一級棒';
@@ -68,6 +67,7 @@ class _InfoSectionContainer extends StatelessWidget {
       // 1. 外部容器使用圖片作為背景 (模擬邊框效果)
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
+        // 🔴 實際專案中，這裡應該使用本地圖片
         image: const DecorationImage(
           image: AssetImage('assets/images/slot_machine_bg.jpg'),
           fit: BoxFit.cover,
@@ -99,9 +99,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // 🔴 參賽者名單已移至 IdentitySelectionWidget 內部，故移除。
-  // final List<String> _participants = const [...];
-
   // 🔴 已驗證的使用者身份 (如果為 null，則身份未定)
   String? _authenticatedUser;
 
@@ -147,7 +144,6 @@ class _HomePageState extends State<HomePage> {
       pageBuilder: (context, a1, a2) {
         // 使用 Builder 取得一個位於 GeneralDialog 內的 Context，以便正確 pop
         return IdentitySelectionWidget(
-          // 🔴 移除 participants 參數
           onVerified: _handleUserVerified,
         );
       },
@@ -228,7 +224,7 @@ class _HomePageState extends State<HomePage> {
 
 
 // ====================================================================
-// 📱 窄螢幕 (手機) 佈局內容 (_MobileBody) - 已修正為整個頁面可滾動
+// 📱 窄螢幕 (手機) 佈局內容 (_MobileBody)
 // ====================================================================
 class _MobileBody extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
@@ -245,7 +241,7 @@ class _MobileBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ----------------------------------------------------
-          // 1. 頭部區域：倒數計時元件 + 主題 Title
+          // 1. 頭部區域：主題 Title + 倒數計時元件 (已交換位置)
           // ----------------------------------------------------
           Padding(
             padding: EdgeInsets.only(
@@ -257,32 +253,8 @@ class _MobileBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 區塊 0: 歡迎訊息
-                if (authenticatedUser != null) ...[
-                  Text(
-                    '${eventData.welcomeMessage}$authenticatedUser！',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade300,
-                      shadows: [
-                        Shadow(blurRadius: 3.0, color: Colors.black.withOpacity(0.8))
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: eventData.mobileTitleSpacing / 2),
-                ],
 
-                // 區塊 1: 倒數計時元件
-                Container(
-                  alignment: Alignment.center,
-                  child: CountdownWidget(targetDateTime: defaultEventTime),
-                ),
-
-                SizedBox(height: eventData.mobileTitleSpacing), // 引用常數
-
-                // 區塊 2: 主題 Title
+                // 區塊 1: 主題 Title (新位置)
                 FittedBox(
                   fit: BoxFit.scaleDown, // 僅縮小
                   child: Text(
@@ -297,7 +269,15 @@ class _MobileBody extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: eventData.mobileTitleSpacing), // 引用常數
+                SizedBox(height: eventData.mobileTitleSpacing), // 引用常數 (標題與倒數計時器間距)
+
+                // 區塊 2: 倒數計時元件 (新位置)
+                Container(
+                  alignment: Alignment.center,
+                  child: CountdownWidget(targetDateTime: defaultEventTime),
+                ),
+
+                SizedBox(height: eventData.mobileTitleSpacing), // 引用常數 (倒數計時器與資訊區間距)
               ],
             ),
           ),
@@ -370,38 +350,13 @@ class _DesktopMainLayout extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 區塊 0: 歡迎訊息
-                if (authenticatedUser != null) ...[
-                  Text(
-                    '${eventData.welcomeMessage}$authenticatedUser！',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade300,
-                      shadows: [
-                        Shadow(blurRadius: 5.0, color: Colors.black.withOpacity(0.8))
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: eventData.desktopTitleSpacing / 2),
-                ],
+
 
                 // ----------------------------------------------------
-                // 1. 頭部區域：倒數計時元件 + 主題 Title
+                // 1. 頭部區域：主題 Title + 倒數計時元件 (已交換位置)
                 // ----------------------------------------------------
-                // 區塊 1: 倒數計時元件
-                Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: CountdownWidget(targetDateTime: defaultEventTime),
-                ),
 
-                SizedBox(height: eventData.desktopTitleSpacing),
-
-                // 區塊 2: 主題 Title
+                // 區塊 1: 主題 Title (新位置)
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -416,7 +371,18 @@ class _DesktopMainLayout extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: eventData.desktopTitleSpacing),
+                SizedBox(height: eventData.desktopTitleSpacing), // 標題與倒數計時器間距
+
+                // 區塊 2: 倒數計時元件 (新位置)
+                Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CountdownWidget(targetDateTime: defaultEventTime),
+                ),
+
+                SizedBox(height: eventData.desktopTitleSpacing), // 倒數計時器與資訊區間距
 
                 // ----------------------------------------------------
                 // 2. 資訊區域

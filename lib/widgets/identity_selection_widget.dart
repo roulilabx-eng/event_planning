@@ -27,9 +27,9 @@ class IdentitySelectionWidget extends StatelessWidget {
   Widget _buildAvatar(BuildContext context, String name, String avatarPath, double radius) {
     return GestureDetector(
       onTap: () {
-        // 🔴 根據使用者要求：暫時註解掉彈出通行碼 Dialog 的功能，只保留顯示畫面。
-        // _showCodeDialog(context, name);
-        debugPrint('Avatar tapped: $name (Functionality is currently disabled.)');
+        // 🔴 根據使用者要求：重新開啟彈出通行碼 Dialog 的功能。
+        _showCodeDialog(context, name);
+        // debugPrint('Avatar tapped: $name (Functionality is currently disabled.)');
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -161,65 +161,176 @@ class IdentitySelectionWidget extends StatelessWidget {
     );
   }
 
-// 🔴 通行碼輸入 Dialog
-/*
+  // 🔴 通行碼輸入 Dialog
   void _showCodeDialog(BuildContext context, String name) {
     final TextEditingController codeController = TextEditingController();
 
+    // 內部處理提交邏輯，以便在 ElevatedButton 和 onSubmitted 中複用
+    void handleSubmission(BuildContext dialogContext, String passcode) {
+      // 🔴 假設通行碼統一為 "1234"
+      if (passcode == '1234') {
+        // 必須先關閉 Dialog
+        Navigator.of(dialogContext).pop();
+        onVerified(name); // 🔴 通過驗證並回傳名稱
+      } else {
+        // 顯示錯誤訊息 (使用外部 context 才能找到 Scaffold)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('通行碼錯誤', textAlign: TextAlign.center),
+            backgroundColor: Colors.redAccent,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+
+    // 🔴 Slot Machine 主題常數
+    const Color _slotMachineColor = Color(0xFF5D4037); // 深棕色，模擬遊戲機底色
+    const Color _titleTextColor = Colors.yellowAccent; // 亮黃色，模擬遊戲機文字
+    const double _outerPadding = 16.0; // 深色背景內的邊距
+    const double _contentMargin = 20.0; // 白底框內部的 Padding
+    const double _cornerRadius = 12.0; // 圓角半徑
+
+    // 🔴 使用 Dialog 來自訂內容
     showDialog(
       context: context,
       barrierDismissible: false, // 🔴 不可隨意關閉
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            '輸入通行碼確認 $name',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: TextField(
-            controller: codeController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: '通行碼',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          actions: [
-            // 🔴 新增取消/重選按鈕，回到身份選擇
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // 🔴 關閉 Dialog 回到身份選擇
-              },
-              child: const Text('取消/重選', style: TextStyle(color: Colors.grey)),
-            ),
-            // 🔴 確認按鈕
-            TextButton(
-              onPressed: () {
-                // 🔴 假設通行碼統一為 "1234"
-                if (codeController.text == '1234') {
-                  // 必須先關閉身份選擇 Dialog (IdentitySelectionWidget 外層的)
-                  Navigator.of(context).pop();
-
-                  onVerified(name); // 🔴 通過驗證並回傳名稱
-                } else {
-                  // 這裡暫時使用 SnackBar，假設外層有 Scaffold
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('通行碼錯誤', textAlign: TextAlign.center),
-                      backgroundColor: Colors.redAccent,
-                      duration: Duration(seconds: 2),
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          // 外部 Dialog 設為透明，讓 Stack 內的 Container 決定形狀和顏色
+          backgroundColor: Colors.transparent,
+          // shape 設為圓角矩形，與內容容器保持一致
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_cornerRadius)),
+          child: Stack(
+            // 允許 X 鈕超出邊界
+            clipBehavior: Clip.none,
+            children: [
+              // 1. 🔴 背景層：模擬 slot_machine_bg (深色主題)
+              Container(
+                decoration: BoxDecoration(
+                  color: _slotMachineColor, // 模擬 slot_machine_bg 的深色底色
+                  borderRadius: BorderRadius.circular(_cornerRadius),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 5)),
+                  ],
+                  // 🔴 實際專案中，slot_machine_bg 應在此處使用：
+                  // image: const DecorationImage(
+                  //   image: AssetImage('assets/slot_machine_bg.png'),
+                  //   fit: BoxFit.cover,
+                  // ),
+                ),
+                // 內邊距，為內容區域留空間
+                padding: const EdgeInsets.all(_outerPadding),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 🔴 頂部標題：位於深色背景上
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                      child: Text(
+                        '請輸入通行碼',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: _titleTextColor, // 使用亮色文字
+                        ),
+                      ),
                     ),
-                  );
-                }
-              },
-              child: const Text('確認', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
-            ),
-          ],
+
+                    // 2. 🔴 內容層：白底框
+                    Container(
+                      // 內部的 padding 調整間距
+                      padding: EdgeInsets.all(_contentMargin),
+                      decoration: BoxDecoration(
+                        color: Colors.white, // 白底
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3)),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // 3. TextField + Confirm Button (並排)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: codeController,
+                                  keyboardType: TextInputType.number,
+                                  // ❌ 移除 obscureText: true, 屬性，實現輸入內容不隱碼
+                                  // obscureText: true,
+                                  // 🔴 禁用複製貼上功能 (保留此功能)
+                                  toolbarOptions: const ToolbarOptions(
+                                    copy: false,
+                                    cut: false,
+                                    paste: false,
+                                    selectAll: false,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: '請輸入', // 提示
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                  ),
+                                  onSubmitted: (value) => handleSubmission(dialogContext, value),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+
+                              // 🔴 確認按鈕 (放在輸入框右側)
+                              SizedBox(
+                                height: 56, // 匹配 TextField 高度
+                                child: ElevatedButton(
+                                  onPressed: () => handleSubmission(dialogContext, codeController.text),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _slotMachineColor, // 按鈕顏色與背景主題色同步
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  ),
+                                  child: const Text('確認', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 4. 🔴 X Icon (Close button - 位於右上角，在 Dialog 之外)
+              Positioned(
+                // 使用負邊距讓 X 鈕脫離主體邊框，浮在右上角
+                top: -12,
+                right: -12,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black87),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    tooltip: '取消/重選',
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
   }
-  */
 }
