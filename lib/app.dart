@@ -1,8 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart'; // 🔴 播放音樂套件
+import 'package:just_audio/just_audio.dart';
 import 'dart:math';
 import 'pages/home_page.dart';
 
+/// ============================================================
+/// ⭐ AppLayout
+/// 全域 RWD + contentWidth 控制中心
+/// 所有頁面 / 元件都能取用此資料 → 完整取代單頁 RWD
+/// ============================================================
+class AppLayout extends InheritedWidget {
+  final double screenWidth;
+  final double screenHeight;
+
+  /// 🔥 全域 Layout Builder 控制的縮放比例（讓 UI 不跑版）
+  final double scale;
+
+  /// 🔥 全域內容最大寬度（行動裝置 / iPad / Web 各自不同）
+  final double contentWidth;
+
+  const AppLayout({
+    super.key,
+    required this.screenWidth,
+    required this.screenHeight,
+    required this.scale,
+    required this.contentWidth,
+    required super.child,
+  });
+
+  static AppLayout of(BuildContext context) {
+    final AppLayout? result =
+    context.dependOnInheritedWidgetOfExactType<AppLayout>();
+    assert(result != null, 'AppLayout not found in widget tree!');
+    return result!;
+  }
+
+  @override
+  bool updateShouldNotify(AppLayout oldWidget) => false;
+}
+
+/// ============================================================
+/// ⭐ 主 App
+/// ============================================================
 class ChristmasApp extends StatefulWidget {
   const ChristmasApp({super.key});
 
@@ -11,10 +49,9 @@ class ChristmasApp extends StatefulWidget {
 }
 
 class _ChristmasAppState extends State<ChristmasApp> {
-  late AudioPlayer _player; // 🔴 音樂播放器
-  final Random _random = Random(); // 🔴 用於隨機挑選音樂
+  late AudioPlayer _player;
+  final Random _random = Random();
 
-  // 🔴 五首本地音樂清單
   final List<String> _audioAssets = [
     'assets/audio/jingle_bells.mp3',
     'assets/audio/silent_night.mp3',
@@ -26,67 +63,115 @@ class _ChristmasAppState extends State<ChristmasApp> {
   @override
   void initState() {
     super.initState();
-    _player = AudioPlayer(); // 🔴 初始化播放器
-    // _playRandomMusic(); // 🔴 啟動隨機背景音樂（如需自動播放解開此行）
+    _player = AudioPlayer();
   }
 
-  /// 🔴 隨機播放五首背景音樂 → 自動播完下一首 → 無限循環
+  /// 🔴 隨機播放背景音樂
   Future<void> _playRandomMusic() async {
     try {
-      while (true) { // 🔴 無限播放
-        final randomIndex = _random.nextInt(_audioAssets.length); // 🔴 隨機取一首
-        final selectedMusic = _audioAssets[randomIndex];
+      while (true) {
+        final index = _random.nextInt(_audioAssets.length);
+        await _player.setAsset(_audioAssets[index]);
+        await _player.play();
 
-        await _player.setAsset(selectedMusic); // 🔴 載入音檔
-        await _player.play(); // 🔴 播放音樂
-
-        // 🔴 等待播放完成，再自動播放下一首
         await _player.playerStateStream.firstWhere(
               (state) => state.processingState == ProcessingState.completed,
         );
       }
     } catch (e) {
-      debugPrint('播放音樂失敗: $e'); // 🔴 錯誤處理
+      debugPrint("播放音樂失敗: $e");
     }
   }
 
   @override
   void dispose() {
-    _player.dispose(); // 🔴 關閉播放器釋放記憶體
+    _player.dispose();
     super.dispose();
   }
 
+  /// ============================================================
+  /// ⭐ 這裡完全處理 RWD（全 app 通用）
+  /// ============================================================
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '🎄 Christmas Interactive Web',
-      theme: ThemeData(
-        fontFamily: 'Arial',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final screenHeight = constraints.maxHeight;
 
-      // 🔴🔴🔴 整個 App 的背景圖片
-      home: Scaffold(
-        backgroundColor: Colors.transparent, // 🔴 透明避免蓋掉背景
-        body: SizedBox.expand( // 🔴 使用 SizedBox.expand 確保容器填滿整個畫面
-          child: Stack(
-            children: [
-              // 🔴 背景圖片
-              Image.asset(
-                'assets/images/christmas_bg.jpg', // 🔴 背景圖片路徑
-                fit: BoxFit.cover, // 🔴 填滿整個螢幕
-                width: double.infinity,
-                height: double.infinity,
+        // ------------------------------------------------------------
+        // 🔥 RWD scale：解決所有跑版問題的核心
+        //    - 基準以 iPhone 13 / 14 = 430px 為主
+        // ------------------------------------------------------------
+        final scale = (screenWidth / 430).clamp(0.75, 1.3);
+
+        // ------------------------------------------------------------
+        // 🔥 contentWidth：所有內容區域最大寬度
+        //
+        // Web  → 固定 480
+        // iPad → 螢幕 60%（最多 560）
+        // 手機 → 螢幕 90%
+        // ------------------------------------------------------------
+        double contentWidth;
+        if (screenWidth >= 900) {
+          contentWidth = 480; // Web
+        } else if (screenWidth >= 600) {
+          contentWidth = (screenWidth * 0.6).clamp(0, 560); // iPad
+        } else {
+          contentWidth = screenWidth * 0.9; // Mobile
+        }
+
+        return AppLayout(
+          screenWidth: screenWidth,
+          screenHeight: screenHeight,
+          scale: scale,
+          contentWidth: contentWidth,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaleFactor: scale, // 🔥 全域字體等比例縮放
+            ),
+
+            /// ============================================================
+            /// ⭐ Transform.scale → 全 App 等比例縮放（最關鍵）
+            /// ============================================================
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: '🎄 Christmas Interactive Web',
+                theme: ThemeData(
+                  fontFamily: 'Arial',
+                  colorScheme:
+                  ColorScheme.fromSeed(seedColor: Colors.red),
+                  useMaterial3: true,
+                ),
+
+                home: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: SizedBox.expand(
+                    child: Stack(
+                      children: [
+                        /// 🔴 app 全域背景
+                        Image.asset(
+                          'assets/images/christmas_bg.jpg',
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+
+                        /// 🔴 主頁面（已自動 RWD，不用調任何 UI）
+                        const HomePage(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              // 🔴 原本頁面
-              const HomePage(),
-            ],
+            ),
           ),
-        ),
-      ),
-      // 🔴🔴🔴 背景設定結束
+        );
+      },
     );
   }
 }

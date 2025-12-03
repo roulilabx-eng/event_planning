@@ -110,6 +110,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "flutter_screenutil",
+      "rootUri": "file:///Users/rolling/.pub-cache/hosted/pub.dev/flutter_screenutil-5.9.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///Users/rolling/Documents/developer/flutter/development/flutter/packages/flutter_test",
       "packageUri": "lib/",
