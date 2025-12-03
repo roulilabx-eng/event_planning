@@ -33,7 +33,7 @@
 
     // 啟動整個 Flutter App
     // runApp(const MyApp());
-    runApp(const ChristmasApp());
+    runApp(const MyApp());
   }
 
   // /// 應用的根組件（StatelessWidget：不需要內部狀態）
