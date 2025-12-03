@@ -222,7 +222,7 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
                     _buildSpinButton(),
 
                     // 結果提示
-                    _buildResultHint(),
+                    // _buildResultHint(),
 
                     // 🔴 移除原本底部的「確認結果並關閉」TextButton
                   ],
