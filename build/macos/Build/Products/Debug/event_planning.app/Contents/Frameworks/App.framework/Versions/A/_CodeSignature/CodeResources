@@ -10,11 +10,11 @@
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.bin</key>
 		<data>
-		Q5q4EIcWUY1UZijBDtdEHVy1Yuk=
+		ZDkg0sSbgaPPzXgYfq7dowtvAZ8=
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<data>
-		iYfaYum/f4ZYm2eG0Um6bM/zrg0=
+		w6ATapepOsnz/aTNiI3/2Q6e1A4=
 		</data>
 		<key>Resources/flutter_assets/FontManifest.json</key>
 		<data>
@@ -48,6 +48,30 @@
 		<data>
 		9VasaSnCEBl5xMkYpL+b3SOLFPQ=
 		</data>
+		<key>Resources/flutter_assets/assets/images/christmas_bg.jpg</key>
+		<data>
+		KJLi6Ax3eHMMTyuZ/hYcTd9nIgM=
+		</data>
+		<key>Resources/flutter_assets/assets/images/santa.png</key>
+		<data>
+		VJJoyByvatSfXxcoKkUmciZoUzE=
+		</data>
+		<key>Resources/flutter_assets/assets/images/slot_machine_bg.jpg</key>
+		<data>
+		4wL/um8IHAOe7M3PZg70vEolyhg=
+		</data>
+		<key>Resources/flutter_assets/assets/images/snowflake.png</key>
+		<data>
+		YRfU7yhsEL0E+udIIY+eCxehkpw=
+		</data>
+		<key>Resources/flutter_assets/assets/images/test.png</key>
+		<data>
+		rjkN6wPuMahGnEdnt+oaAoz6gm8=
+		</data>
+		<key>Resources/flutter_assets/assets/images/tree.png</key>
+		<data>
+		MvvtTleEUyaRksG/lpFIR5Yf5Wc=
+		</data>
 		<key>Resources/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
 		<data>
 		/CUoTuPQqqdexfyOT9lpJhV+2MQ=
@@ -58,7 +82,7 @@
 		</data>
 		<key>Resources/flutter_assets/kernel_blob.bin</key>
 		<data>
-		3uhm0aRfqofxXqy5d59zv++zHgU=
+		xgraaZv3LnjtMhx9doGaJ8Nx7to=
 		</data>
 		<key>Resources/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -86,14 +110,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Aw8BL59l9pG9fXdgWQj66rYsCmn+4xlGi62qclNWx4w=
+			rDGab9qbeAQc4o2Uk2fymI07Pt36XQykl3tm3+ybKOI=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			lYm3b2LABZqZHMSoPM5cefAGM/QgPdCYwJOsE1uMFxw=
+			QfsTzqs+2WqJBmcprbkPdzLNU4a+4UcVb/TOCH3tY2s=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/FontManifest.json</key>
@@ -152,6 +176,48 @@
 			nJNmgepJ1uCGx04/v78rwhzTd5jHkS5MCLD0GyQ+kYU=
 			</data>
 		</dict>
+		<key>Resources/flutter_assets/assets/images/christmas_bg.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ae3+CwjnsnQ8y8Seo2iUvn2YTHd1a74RPWqTZUVcARU=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/images/santa.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			E7H+6DpukNHk1ENcsCqXC8elEgiQxElF/y3XLxWwTG0=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/images/slot_machine_bg.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			fU7fiUkOsPGFu2VKa7rABE2+Zmq0Uarxow0KPnQDyX8=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/images/snowflake.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mYODKAL1v+SWP94G2+MAmoKsbZRxK8Q6u6vfSYfQ2zE=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/images/test.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			3jX+1+Pg2inNkzX3FVSJwn30Ksg8dnafAUfU0b3Yl5A=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/assets/images/tree.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5hI4WDcYWbViwreGWyySLTNP4cSnig+l+l4pDhz31Ec=
+			</data>
+		</dict>
 		<key>Resources/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
 		<dict>
 			<key>hash2</key>
@@ -170,7 +236,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			gT3KZGC1Q2LVZcfVJ3MihZTDQvsb68NFApeTwxrQAQY=
+			oTU2SCV/9kD/gmye3UYaOaLfCndog1u+RwmMyAGW/VU=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

@@ -12,9 +12,9 @@ class ChristmasApp extends StatefulWidget {
 
 class _ChristmasAppState extends State<ChristmasApp> {
   late AudioPlayer _player; // 🔴 音樂播放器
-  final Random _random = Random();
+  final Random _random = Random(); // 🔴 用於隨機挑選音樂
 
-  // 🔴 本地五首音樂清單
+  // 🔴 五首本地音樂清單
   final List<String> _audioAssets = [
     'assets/audio/jingle_bells.mp3',
     'assets/audio/silent_night.mp3',
@@ -27,35 +27,32 @@ class _ChristmasAppState extends State<ChristmasApp> {
   void initState() {
     super.initState();
     _player = AudioPlayer(); // 🔴 初始化播放器
-    // _playRandomMusic(); // 🔴 啟動自動隨機背景音樂
+    // _playRandomMusic(); // 🔴 啟動隨機背景音樂（如需自動播放解開此行）
   }
 
-  /// 🔴 隨機播放五首本地音樂並無限循環
+  /// 🔴 隨機播放五首背景音樂 → 自動播完下一首 → 無限循環
   Future<void> _playRandomMusic() async {
     try {
-      while (true) { // 🔴 無限循環
-        // 🔴 隨機選一首音樂
-        final randomIndex = _random.nextInt(_audioAssets.length);
+      while (true) { // 🔴 無限播放
+        final randomIndex = _random.nextInt(_audioAssets.length); // 🔴 隨機取一首
         final selectedMusic = _audioAssets[randomIndex];
 
-        // 🔴 設定播放資源
-        await _player.setAsset(selectedMusic);
-
-        // 🔴 播放音樂
-        await _player.play();
+        await _player.setAsset(selectedMusic); // 🔴 載入音檔
+        await _player.play(); // 🔴 播放音樂
 
         // 🔴 等待播放完成，再自動播放下一首
-        await _player.playerStateStream
-            .firstWhere((state) => state.processingState == ProcessingState.completed);
+        await _player.playerStateStream.firstWhere(
+              (state) => state.processingState == ProcessingState.completed,
+        );
       }
     } catch (e) {
-      debugPrint('播放音樂失敗: $e');
+      debugPrint('播放音樂失敗: $e'); // 🔴 錯誤處理
     }
   }
 
   @override
   void dispose() {
-    _player.dispose(); // 🔴 釋放播放器資源
+    _player.dispose(); // 🔴 關閉播放器釋放記憶體
     super.dispose();
   }
 
@@ -69,7 +66,27 @@ class _ChristmasAppState extends State<ChristmasApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: const HomePage(), // 🔴 首頁
+
+      // 🔴🔴🔴 整個 App 的背景圖片
+      home: Scaffold(
+        backgroundColor: Colors.transparent, // 🔴 透明避免蓋掉背景
+        body: SizedBox.expand( // 🔴 使用 SizedBox.expand 確保容器填滿整個畫面
+          child: Stack(
+            children: [
+              // 🔴 背景圖片
+              Image.asset(
+                'assets/images/christmas_bg.jpg', // 🔴 背景圖片路徑
+                fit: BoxFit.cover, // 🔴 填滿整個螢幕
+                width: double.infinity,
+                height: double.infinity,
+              ),
+              // 🔴 原本頁面
+              const HomePage(),
+            ],
+          ),
+        ),
+      ),
+      // 🔴🔴🔴 背景設定結束
     );
   }
 }
