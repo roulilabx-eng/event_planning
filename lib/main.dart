@@ -1,14 +1,17 @@
 // 匯入 Flutter 的核心 UI 套件（提供常見的 Widget，如 MaterialApp、Scaffold、TextField、Button 等）
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 // 匯入 Supabase Flutter SDK，用來與 Supabase 資料庫溝通
-  import 'package:supabase_flutter/supabase_flutter.dart';
-
-  import 'app.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'repositories/database_repository.dart'; // 引入 Repository
+import 'app.dart';
 
 /// main() 為 Flutter 應用的進入點（所有應用從這裡開始執行）
   Future<void> main() async {
     // Flutter 的 Widgets 系統初始化（確保在 runApp 前能安全呼叫 plugin 或 async 初始化）
     WidgetsFlutterBinding.ensureInitialized();
+
+    // 🏆 初始化 Supabase 連線 🏆
+    await DatabaseRepository.initializeSupabase();
 
     // const supabaseUrl = 'https://ihpietkzzyueineodphr.supabase.co';
     // const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlocGlldGt6enl1ZWluZW9kcGhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MjUzMDQsImV4cCI6MjA3ODUwMTMwNH0.gWZvAl7cReHVYIlrqODjik1vBtX3wDbl5fkIz-DSR6U';

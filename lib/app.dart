@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:math';
-import 'database_repository.dart'; // 導入 Supabase 服務
+import 'repositories/database_repository.dart'; // 引入 Repository
 import 'pages/home_page.dart';
 
 // ============================================================
@@ -19,6 +19,9 @@ Future<void> main() async {
   //   debugPrint('Supabase 初始化失敗: $e');
   //   // 可以在此處顯示一個錯誤頁面或日誌，但不阻擋應用啟動
   // }
+
+  // 🏆 初始化 Supabase 連線 🏆
+  await DatabaseRepository.initializeSupabase();
 
   runApp(const MyApp());
 }
