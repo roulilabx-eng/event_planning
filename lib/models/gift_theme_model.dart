@@ -1,28 +1,47 @@
 // lib/models/gift_theme_model.dart
 
 // ====================================================================
-// 1. 資料模型：禮物主題 (GiftTheme Model)
-// 此模型用於儲存 Supabase 中 'gift_themes' 表格的資料結構。
+// 🎁 禮物主題模型 (GiftTheme Model)
+// 對應資料庫中的 public.gift_themes 資料表
 // ====================================================================
 class GiftTheme {
-  final String id;
-  final String name;
-  final String emoji;
+  final int id;
+  final String name; // 主題名稱 (name)
+  final bool isActive; // 是否啟用 (is_active)
+  final DateTime createdAt; // 創建時間 (created_at)
 
-  GiftTheme({
+  const GiftTheme({
     required this.id,
     required this.name,
-    required this.emoji,
+    required this.isActive,
+    required this.createdAt,
   });
 
-  // Factory 函式：從 JSON/Map 建立 GiftTheme 物件
+  // ----------------------------------------------------
+  // 從 JSON 轉換 (例如從 Supabase 取得的 Map 資料)
+  // ----------------------------------------------------
   factory GiftTheme.fromJson(Map<String, dynamic> json) {
+    if (json['id'] == null || json['name'] == null) {
+      throw const FormatException("GiftTheme data missing required fields (id or name).");
+    }
+
     return GiftTheme(
-      // 確保 id 欄位 (可能是 int8) 被安全地轉換為 String
-      id: json['id']?.toString() ?? '',
-      name: json['theme_name'] as String,
-      // 處理 emoji 欄位可能為空的情況，預設為 '🎁'
-      emoji: json['theme_emoji'] as String? ?? '🎁',
+      id: (json['id'] as int),
+      name: json['name'] as String,
+      isActive: (json['is_active'] ?? false) as bool,
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
+  }
+
+  // ----------------------------------------------------
+  // 轉換為 Map (例如用於 Supabase 插入或更新)
+  // ----------------------------------------------------
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'is_active': isActive,
+      'created_at': createdAt.toUtc().toIso8601String(),
+    };
   }
 }
