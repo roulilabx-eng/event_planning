@@ -14,11 +14,10 @@ import '../globals.dart' as globals;
 
 // ====================================================================
 // 🎁 活動資料與常數結構 (Event Data and Constants)
-// 將所有文字內容和特定尺寸常數集中於此
 // ====================================================================
 class EventData {
   // --- Strings ---
-  final String mainTitle = '🎁 聖誕 Ｘ 猜謎 Ｘ 交換禮物 🎁'; // 這裡不再是歡迎語，而是活動主標題
+  final String mainTitle = '🎁 聖誕 Ｘ 猜謎 Ｘ 交換禮物 🎁';
 
   final String infoTitle1 = '🎄 活動資訊 🎄';
   final String infoTheme = '主題｜再不猜謎就瘋狂 - 真相只有一個 ☝️';
@@ -26,13 +25,13 @@ class EventData {
   final String infoLocation = '地點｜海底撈';
 
   final String infoTitle2 = '🔔 活動須知 🔔';
-  final String infoDressCode = 'Dress Code｜聖誕紅綠穿搭  🚨小黑人強力要求 🚨';
+  final String infoDressCode = 'Dress Code｜聖誕紅綠穿搭 🚨小黑人強力要求';
   final String infoGiftPrefix = '禮物主題｜';
-  final String infoGiftClick = '請點擊';
+  final String infoGiftClick = '請點擊'; // ⚠️ 這個常數在新的按鈕設計中實際上不再使用
   final String infoGiftAmount = '禮物金額｜300 up up';
 
   final String infoQA = '禮物猜謎｜請準備 1 個 5分鐘 內可以完成的猜謎';
-  final String infoQA_detail = '必須有明確答案且題目道具或紙張小於A4\n(類型不限：謎語 / 腦筋急轉彎 / 動手做 / 搞怪題)';
+  final String infoQA_detail = '必須有明確答案，問題紙或道具需於A4大小內\n(類型不限：謎語 / 腦筋急轉彎 / 動手做 / 搞怪題)';
 
   final String infoTitle3 = '🎉 活動流程 🎉';
   final String processStep1 = '入場 & 報到（工作人員會收集謎題)';
@@ -451,12 +450,12 @@ class _DesktopMainLayout extends StatelessWidget {
 
 // 1. 活動資訊區塊
 Widget _buildEventInfoSection(
-  BuildContext context,
-  TextStyle titleStyle,
-  TextStyle contentStyle,
-  double sectionSpacing,
-  Function(BuildContext) showLocationDialog,
-) {
+    BuildContext context,
+    TextStyle titleStyle,
+    TextStyle contentStyle,
+    double sectionSpacing,
+    Function(BuildContext) showLocationDialog,
+    ) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -475,11 +474,11 @@ Widget _buildEventInfoSection(
 
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 
-                side: const BorderSide(
-                  color: Colors.red, // 👈 設置您想要的框線顏色，例如紅色
-                  width: 2,          // 設置框線寬度，例如 2 像素
-                  // style: BorderStyle.solid, // 默認為 solid，可以省略
-                ),
+              side: const BorderSide(
+                color: Colors.red, // 👈 設置您想要的框線顏色，例如紅色
+                width: 2,          // 設置框線寬度，例如 2 像素
+                // style: BorderStyle.solid, // 默認為 solid，可以省略
+              ),
             ),
             onPressed: () => showLocationDialog(context),
             child: const Text(
@@ -496,7 +495,7 @@ Widget _buildEventInfoSection(
   );
 }
 
-// 2. 活動須知區塊 (包含點擊事件)
+// 2. 活動須知區塊 (包含點擊事件) - 🎯 已修改按鈕樣式
 Widget _buildRequirementSection(BuildContext context, Function(BuildContext) showSlotMachineDialog, TextStyle titleStyle, TextStyle contentStyle, double sectionSpacing) {
   // 定義紅色字體的樣式，繼承自 contentStyle
   final TextStyle redContentStyle = contentStyle.copyWith(
@@ -512,19 +511,42 @@ Widget _buildRequirementSection(BuildContext context, Function(BuildContext) sho
       Text(eventData.infoDressCode, style: contentStyle), // 顯示 Dress Code
       SizedBox(height: sectionSpacing / 4),
 
-      // 禮物主題 (點擊事件，彈出拉霸機)
+      // 禮物主題 (點擊事件，彈出拉霸機) - 🌟 新的金色邊框、紅底、綠字圓形按鈕
       Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center, // 讓文字和按鈕居中對齊
         children: [
-          // 這裡的文字也要套用 contentStyle (粗體+加大)
+          // 禮物主題文字
           Text(eventData.infoGiftPrefix, style: contentStyle),
-          InkWell(
-            onTap: () => showSlotMachineDialog(context),
-            child: Text(
-              eventData.infoGiftClick,
-              style: contentStyle.copyWith(
-                color: Colors.blue.shade700,
-                decoration: TextDecoration.underline,
+          const SizedBox(width: 8), // 增加間隔
+
+          // 🌟 新按鈕實作: OutlinedButton for custom style
+          SizedBox(
+            height: 30, // 限制按鈕高度
+            child: OutlinedButton(
+              onPressed: () => showSlotMachineDialog(context),
+              style: OutlinedButton.styleFrom(
+                // 1. 紅底
+                backgroundColor: Colors.red.shade700,
+                // 2. 圓形按鈕
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20), // 設置大圓角
+                ),
+                // 3. 金色邊框 (使用 side)
+                side: BorderSide(
+                  color: Colors.yellow.shade700!, // 金色
+                  width: 2,
+                ),
+                // 減少 padding 以符合小按鈕
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              ),
+              child: const Text(
+                '請選擇', // 4. 文字改為「請選擇」
+                style: TextStyle(
+                  // 5. 綠字
+                  color: Colors.green, // 明亮的綠色
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14, // 適合小按鈕的字體大小
+                ),
               ),
             ),
           ),
@@ -563,11 +585,11 @@ Widget _buildProcessSection(TextStyle titleStyle, TextStyle contentStyle, double
 // 共用的活動資訊內容函式 (主要排版管理器)
 // ====================================================================
 Widget _buildInfoContent(
-  BuildContext context,
-  Function(BuildContext) showSlotMachineDialog,
-  Function(BuildContext) showLocationDialog, {
-  required bool isMobile,
-}) {
+    BuildContext context,
+    Function(BuildContext) showSlotMachineDialog,
+    Function(BuildContext) showLocationDialog, {
+      required bool isMobile,
+    }) {
   const TextStyle titleStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.deepPurple);
 
   // 樣式調整：內文文字設為粗體，並加大 1 點
