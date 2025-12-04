@@ -7,30 +7,18 @@ import '../globals.dart' as globals;
 import '../models/participant_model.dart';
 
 // -----------------------------------------------------------------------------
-// 🔹 SlotMachineController (模組化控制邏輯)
+// 🔹 SlotMachineController
 // -----------------------------------------------------------------------------
 class SlotMachineController {
   final Random _random = Random();
   List<GiftTheme> themes = [];
   String? lastAssignedThemeName;
 
-  /// 初始化：載入主題列表 + 上一次抽到的主題
   Future<void> initialize() async {
-
-    print('我進來了');
-
     try {
       themes = await DatabaseRepository.getGiftThemes();
-      print('Loaded gift themes: ${themes.length}');  // 🔴
     } catch (e, st) {
-      print('Error loading gift themes: $e\n$st');  // 🔴
-    }
-
-
-    // 🔴 新增檢查是否有取得資料
-    print('Loaded gift themes: ${themes.length}');
-    for (var t in themes) {
-      print('Theme: id=${t.id}, name=${t.name}, code=${t.code}');
+      print('Error loading gift themes: $e\n$st');
     }
 
     if (themes.isEmpty) return;
@@ -38,7 +26,6 @@ class SlotMachineController {
     if (globals.currentUserNum != null) {
       final Participant? userData =
       await globals.getParticipantByNum(globals.currentUserNum!);
-
       if (userData != null && userData.giftAssignedTheme != null) {
         final matchedThemes =
         themes.where((t) => t.code == userData.giftAssignedTheme).toList();
@@ -49,13 +36,11 @@ class SlotMachineController {
     }
   }
 
-  /// 隨機取得最終索引
   int getRandomIndex() {
     if (themes.isEmpty) return 0;
     return _random.nextInt(themes.length);
   }
 
-  /// 更新使用者最後抽到的主題
   Future<void> updateUserAssignedTheme(int index) async {
     if (globals.currentUserNum == null || themes.isEmpty) return;
     final theme = themes[index];
@@ -63,17 +48,29 @@ class SlotMachineController {
         globals.currentUserNum!, theme.code);
     lastAssignedThemeName = theme.name;
   }
+
+  Future<String> fetchLatestUserTheme() async {
+    if (globals.currentUserNum == null) return "無抽籤資料";
+    final Participant? userData =
+    await globals.getParticipantByNum(globals.currentUserNum!);
+    if (userData == null || userData.giftAssignedTheme == null) {
+      return "無抽籤資料";
+    }
+    final matchedThemes =
+    themes.where((t) => t.code == userData.giftAssignedTheme).toList();
+    if (matchedThemes.isEmpty) return "無抽籤資料";
+    return matchedThemes.first.name;
+  }
 }
 
 // -----------------------------------------------------------------------------
-// 🔹 SlotMachineDisplay (UI顯示元件)
+// 🔹 SlotMachineDisplay
 // -----------------------------------------------------------------------------
 class SlotMachineDisplay extends StatelessWidget {
   final double reelSize;
   final double itemHeight;
   final ScrollController scrollController;
   final List<GiftTheme> themes;
-  final bool isSpinning;
 
   const SlotMachineDisplay({
     super.key,
@@ -81,39 +78,13 @@ class SlotMachineDisplay extends StatelessWidget {
     required this.itemHeight,
     required this.scrollController,
     required this.themes,
-    required this.isSpinning,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (themes.isEmpty) return const SizedBox.shrink();
-
-    Widget _buildItem(BuildContext context, int i) {
-      final theme = themes[i % themes.length];
-      final themeName = theme.name;
-
-      return Container(
-        height: itemHeight,
-        color: Colors.white,
-        alignment: const Alignment(0, -0.05),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: FittedBox(
-          child: Text(
-            themeName,
-            style: TextStyle(
-              fontSize: reelSize * 0.1,
-              fontWeight: FontWeight.w900,
-              color: Colors.red.shade900,
-            ),
-          ),
-        ),
-      );
-    }
-
     return Container(
       width: reelSize,
       height: itemHeight,
-      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.red.shade800,
         borderRadius: BorderRadius.circular(15),
@@ -123,7 +94,7 @@ class SlotMachineDisplay extends StatelessWidget {
             color: Colors.black54,
             blurRadius: 10,
             offset: Offset(0, 6),
-          )
+          ),
         ],
       ),
       child: ClipRRect(
@@ -131,11 +102,26 @@ class SlotMachineDisplay extends StatelessWidget {
         child: ListView.builder(
           controller: scrollController,
           itemExtent: itemHeight,
-          physics: isSpinning
-              ? const NeverScrollableScrollPhysics()
-              : const ClampingScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: 999999999,
-          itemBuilder: _buildItem,
+          itemBuilder: (_, index) {
+            final theme = themes[index % themes.length];
+            return Container(
+              alignment: Alignment.center,
+              height: itemHeight,
+              color: Colors.white,
+              child: FittedBox(
+                child: Text(
+                  theme.name,
+                  style: TextStyle(
+                    fontSize: reelSize * 0.12,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.red.shade900,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -143,7 +129,7 @@ class SlotMachineDisplay extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 🔹 SlotMachineWidget (主 Widget)
+// 🔹 SlotMachineWidget
 // -----------------------------------------------------------------------------
 class SlotMachineWidget extends StatefulWidget {
   const SlotMachineWidget({super.key});
@@ -169,6 +155,15 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
   Future<void> _initialize() async {
     await _controller.initialize();
     if (!mounted) return;
+
+    if (_controller.themes.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.jumpTo(0); // 初始滾動到第一筆
+        setState(() {
+          _currentSlotIndex = 0;
+        });
+      });
+    }
     setState(() {});
   }
 
@@ -189,20 +184,16 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
     final int themeCount = _controller.themes.length;
     final int finalResult = _controller.getRandomIndex();
 
-    final double startOffset = _scrollController.offset;
-    final double cycleHeight = _itemHeight * themeCount;
-    final double offsetInCurrentCycle = startOffset % cycleHeight;
-
-    double distance = cycleHeight * fullReels;
-    distance += (_itemHeight * finalResult) - offsetInCurrentCycle;
-
-    if (distance < 0) distance += cycleHeight;
+    // 計算最終 offset 精準對齊
+    final double cycleHeight = themeCount * _itemHeight;
+    final double targetOffset =
+        (fullReels * themeCount + finalResult) * _itemHeight;
 
     try {
       await _scrollController.animateTo(
-        startOffset + distance,
+        targetOffset,
         duration: Duration(milliseconds: (spinDurationSeconds * 1000).toInt()),
-        curve: Curves.easeOutQuart,
+        curve: Curves.easeOutCubic,
       );
     } catch (_) {}
 
@@ -211,11 +202,53 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
     setState(() {
       _isSpinning = false;
       _currentSlotIndex = finalResult;
+      _controller.lastAssignedThemeName = _controller.themes[finalResult].name;
     });
 
     await _controller.updateUserAssignedTheme(_currentSlotIndex);
+  }
+
+  void _showLatestThemeDialog() async {
+    String latestTheme = await _controller.fetchLatestUserTheme();
     if (!mounted) return;
-    setState(() {});
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.yellow.shade100,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.yellow.shade700, width: 3),
+          ),
+          content: Text(
+            latestTheme,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow.shade700,
+                foregroundColor: Colors.grey.shade800,
+                padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                "我知道了",
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -223,12 +256,15 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
     final screenWidth = MediaQuery.of(context).size.width;
     final double maxWidth = min(screenWidth * 0.9, 450.0);
     final double reelSize = maxWidth - 48;
-    final double itemHeight = reelSize * 0.4;
+    _itemHeight = min(reelSize * 0.3, 80);
+
+    final double maxPopupHeight = MediaQuery.of(context).size.height * 0.6;
 
     return Center(
       child: Material(
         color: Colors.transparent,
         child: Container(
+          constraints: BoxConstraints(maxHeight: maxPopupHeight),
           width: maxWidth,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -240,18 +276,19 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
                 color: Colors.black54,
                 blurRadius: 20,
                 offset: Offset(0, 8),
-              )
+              ),
             ],
           ),
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
               Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 36),
                     child: Text(
-                      '禮物主題拉霸機',
+                      '抽取專屬禮物主題',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -262,46 +299,58 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
                   const SizedBox(height: 20),
                   SlotMachineDisplay(
                     reelSize: reelSize,
-                    itemHeight: itemHeight,
+                    itemHeight: _itemHeight,
                     scrollController: _scrollController,
                     themes: _controller.themes,
-                    isSpinning: _isSpinning,
                   ),
                   const SizedBox(height: 30),
-                  ElevatedButton.icon(
-                    onPressed: _isSpinning ? null : _spin,
-                    icon: _isSpinning
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 3,
-                      ),
-                    )
-                        : const Icon(Icons.casino_outlined),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow.shade700,
-                      foregroundColor: Colors.red.shade900,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 15),
-                    ),
-                    label: Text(
-                      _isSpinning ? '轉動中...' : '開始抽籤！',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                  IntrinsicWidth(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _isSpinning ? null : _spin,
+                          icon: _isSpinning
+                              ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                              : const Icon(Icons.casino_outlined),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.yellow.shade700,
+                            foregroundColor: Colors.red.shade900,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 15),
+                          ),
+                          label: Text(
+                            _isSpinning ? '轉動中...' : '開始抽籤！',
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: _showLatestThemeDialog,
+                          icon: const Icon(Icons.info_outline),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.yellow.shade700,
+                            foregroundColor: Colors.red.shade900,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 15),
+                          ),
+                          label: const Text(
+                            "目前主題",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  if (_controller.lastAssignedThemeName != null)
-                    Text(
-                      '上一次抽到的禮物主題：${_controller.lastAssignedThemeName}',
-                      style: const TextStyle(
-                        color: Colors.yellow,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
                 ],
               ),
               Positioned(
@@ -318,7 +367,7 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
                         color: Colors.black45,
                         blurRadius: 8,
                         offset: Offset(2, 4),
-                      )
+                      ),
                     ],
                   ),
                   child: IconButton(
