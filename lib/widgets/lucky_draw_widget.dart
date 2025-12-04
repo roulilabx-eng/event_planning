@@ -17,14 +17,8 @@ class LuckyDrawWidget extends StatefulWidget {
 }
 
 class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
-  // 🎯 抽獎項目列表 (假資料) - ⚠️ 注意: 實際應使用 GiftTheme.code
-  final List<String> _items = [
-    '🎬 電影主題',
-    '🗺️ 旅遊景點',
-    '🍲 特色美食',
-    '📚 書籍名稱',
-    '🕹️ 經典遊戲'
-  ];
+  // 🎯 抽獎項目列表 (使用全域啟用的主題名稱)
+  List<String> _items = [];
 
   // 狀態變數
   bool _isDrawing = false;
@@ -33,15 +27,35 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   @override
   void initState() {
     super.initState();
-    // 初始化時可以顯示第一個項目，讓 UI 看起來不空
-    _currentResult = _items[0];
+
+    // 🎯 核心變更: 從全域列表載入並過濾主題
+    // ⚠️ 假設 GiftTheme 模型中 'is_active' 屬性代表是否啟用。
+    _items = globals.globalGiftThemes
+    // 篩選出 is_active 為 true 的主題
+        .where((theme) => theme.isActive)
+    // 轉換為主題名稱 (name) 列表，用於抽獎顯示
+        .map((theme) => theme.name)
+        .toList();
+
+    // 根據主題列表是否為空來設定初始顯示文字
+    if (_items.isEmpty) {
+      if (globals.globalGiftThemesLoaded) {
+        _currentResult = '❌ 找不到任何已啟用的主題';
+      } else {
+        _currentResult = '⚠️ 主題資料尚未載入';
+      }
+    } else {
+      // 初始顯示第一個項目
+      _currentResult = _items[0];
+    }
   }
 
   // ----------------------------------------------------
   // 核心邏輯: 開始抽獎
   // ----------------------------------------------------
   void _startDraw() async {
-    if (_isDrawing) return;
+    // 檢查是否有可用主題或是否正在抽獎
+    if (_isDrawing || _items.isEmpty) return;
 
     setState(() {
       _isDrawing = true;
