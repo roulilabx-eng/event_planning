@@ -253,14 +253,14 @@ class _HomePageState extends State<HomePage> {
           // 4. RWD 主體內容 (最上層)
           ResponsiveLayout(
             mobile: _MobileBody(
-              showSlotMachineDialog: _showSlotMachineDialog,
-              showLuckyDrawDialog: _showLuckyDrawDialog, // 🎯 傳遞新的函式
+              // ⚠️ 移除 showSlotMachineDialog 的傳遞，因為不再使用
+              showLuckyDrawDialog: _showLuckyDrawDialog,
               showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
             desktop: _DesktopBody(
-              showSlotMachineDialog: _showSlotMachineDialog,
-              showLuckyDrawDialog: _showLuckyDrawDialog, // 🎯 傳遞新的函式
+              // ⚠️ 移除 showSlotMachineDialog 的傳遞，因為不再使用
+              showLuckyDrawDialog: _showLuckyDrawDialog,
               showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
@@ -276,12 +276,12 @@ class _HomePageState extends State<HomePage> {
 // 📱 窄螢幕 (手機) 佈局內容 (_MobileBody)
 // ====================================================================
 class _MobileBody extends StatelessWidget {
-  final Function(BuildContext) showSlotMachineDialog;
+  // ⚠️ 移除 showSlotMachineDialog 宣告
   final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _MobileBody({
-    required this.showSlotMachineDialog,
+    // ⚠️ 移除 showSlotMachineDialog 參數
     required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
@@ -348,7 +348,8 @@ class _MobileBody extends StatelessWidget {
                 _InfoSectionContainer(
                   child: _buildInfoContent(
                     context,
-                    showSlotMachineDialog,
+                    // ⚠️ 這裡不再傳遞 showSlotMachineDialog
+                        (_) {}, // 傳遞一個空函數作為佔位符
                     showLuckyDrawDialog, // 🎯 傳遞新的函式
                     showLocationDialog,
                     isMobile: true,
@@ -370,12 +371,12 @@ class _MobileBody extends StatelessWidget {
 // 💻 寬螢幕 (桌面/平板) 佈局內容 (_DesktopBody)
 // ====================================================================
 class _DesktopBody extends StatelessWidget {
-  final Function(BuildContext) showSlotMachineDialog;
+  // ⚠️ 移除 showSlotMachineDialog 宣告
   final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _DesktopBody({
-    required this.showSlotMachineDialog,
+    // ⚠️ 移除 showSlotMachineDialog 參數
     required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
@@ -384,7 +385,7 @@ class _DesktopBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _DesktopMainLayout(
-      showSlotMachineDialog: showSlotMachineDialog,
+      // ⚠️ 移除 showSlotMachineDialog 的傳遞
       showLuckyDrawDialog: showLuckyDrawDialog, // 🎯 傳遞新的函式
       showLocationDialog: showLocationDialog,
       authenticatedUser: authenticatedUser,
@@ -397,12 +398,12 @@ class _DesktopBody extends StatelessWidget {
 // 桌面主內容佈局 (_DesktopMainLayout) - 已修正為整個頁面可滾動
 // ====================================================================
 class _DesktopMainLayout extends StatelessWidget {
-  final Function(BuildContext) showSlotMachineDialog;
+  // ⚠️ 移除 showSlotMachineDialog 宣告
   final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _DesktopMainLayout({
-    required this.showSlotMachineDialog,
+    // ⚠️ 移除 showSlotMachineDialog 參數
     required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
@@ -468,7 +469,8 @@ class _DesktopMainLayout extends StatelessWidget {
                 _InfoSectionContainer(
                   child: _buildInfoContent(
                     context,
-                    showSlotMachineDialog,
+                    // ⚠️ 這裡不再傳遞 showSlotMachineDialog
+                        (_) {}, // 傳遞一個空函數作為佔位符
                     showLuckyDrawDialog, // 🎯 傳遞新的函式
                     showLocationDialog,
                     isMobile: false,
@@ -535,10 +537,11 @@ Widget _buildEventInfoSection(
   );
 }
 
-// 2. 活動須知區塊 (包含點擊事件) - 🎯 包含「請選擇」和「你猜猜」兩個按鈕
+// 2. 活動須知區塊 (包含點擊事件) - 🎯 僅保留「你猜猜」按鈕
 Widget _buildRequirementSection(
     BuildContext context,
-    Function(BuildContext) showSlotMachineDialog,
+    // ⚠️ 移除 showSlotMachineDialog 參數
+    Function(BuildContext) showSlotMachineDialog, // 雖然未使用，但為保持函數簽名一致，先保留
     Function(BuildContext) showLuckyDrawDialog, // 🎯 新增的函式參數
     TextStyle titleStyle,
     TextStyle contentStyle,
@@ -583,7 +586,7 @@ Widget _buildRequirementSection(
       Text(eventData.infoDressCode, style: contentStyle), // 顯示 Dress Code
       SizedBox(height: sectionSpacing / 4),
 
-      // 禮物主題 (包含兩個按鈕)
+      // 禮物主題 (只包含「你猜猜」按鈕)
       Row(
         crossAxisAlignment: CrossAxisAlignment.center, // 讓文字和按鈕居中對齊
         children: [
@@ -591,27 +594,11 @@ Widget _buildRequirementSection(
           Text(eventData.infoGiftPrefix, style: contentStyle),
           const SizedBox(width: 8), // 間隔
 
-          // 1. 「請選擇」按鈕 (觸發 SlotMachine)
+          // 🎯 僅保留 「你猜猜」按鈕 (觸發 LuckyDraw)
           SizedBox(
             height: 30, // 限制按鈕高度
             child: OutlinedButton(
-              onPressed: () => showSlotMachineDialog(context),
-              style: customButtonStyle,
-              child: const Text(
-                '請選擇',
-                style: customButtonTextStyle,
-              ),
-            ),
-          ),
-
-          // 2. 兩個按鈕之間的間隔
-          const SizedBox(width: 8),
-
-          // 3. 「你猜猜」按鈕 (🎯 觸發 LuckyDraw)
-          SizedBox(
-            height: 30, // 限制按鈕高度
-            child: OutlinedButton(
-              onPressed: () => showLuckyDrawDialog(context), // 🎯 呼叫新的函式
+              onPressed: () => showLuckyDrawDialog(context), // 呼叫 LuckyDraw 函式
               style: customButtonStyle,
               child: const Text(
                 '你猜猜',
