@@ -29,11 +29,9 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
     super.initState();
 
     // 🎯 核心變更: 從全域列表載入並過濾主題
-    // ⚠️ 假設 GiftTheme 模型中 'is_active' 屬性代表是否啟用。
+    // 篩選出 is_active 為 true 的主題，並轉換為主題名稱 (name) 列表
     _items = globals.globalGiftThemes
-    // 篩選出 is_active 為 true 的主題
         .where((theme) => theme.isActive)
-    // 轉換為主題名稱 (name) 列表，用於抽獎顯示
         .map((theme) => theme.name)
         .toList();
 
@@ -51,7 +49,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   }
 
   // ----------------------------------------------------
-  // 核心邏輯: 開始抽獎
+  // 核心邏輯: 開始抽獎 (已加入資料儲存邏輯)
   // ----------------------------------------------------
   void _startDraw() async {
     // 檢查是否有可用主題或是否正在抽獎
@@ -64,30 +62,21 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
     // 1. 預先決定最終結果
     final random = Random();
     final resultIndex = random.nextInt(_items.length);
-    final String finalResult = _items[resultIndex];
+    final String finalResult = _items[resultIndex]; // 主題名稱 (Name)
 
-    // 2. 規劃滾動步驟和變速邏輯
-    // 總時長約 3 秒 (60 步 * 50ms = 3000ms)
+    // 2. 規劃滾動步驟和變速邏輯 (略)
     const int totalSpins = 60;
-    // 恆定快速延遲 (50ms)
     const int fastDelay = 50;
 
     for (int i = 0; i < totalSpins; i++) {
       if (!mounted) return;
-
-      // 恆定延遲
-      int delayMs = fastDelay;
-
-      await Future.delayed(Duration(milliseconds: delayMs));
+      await Future.delayed(const Duration(milliseconds: fastDelay));
 
       // 3. 滾動邏輯
       setState(() {
         if (i < totalSpins - 1) {
-          // 滾動中：顯示下一個項目
-          // 使用 (i + 1) 確保每次都不同，並循環使用列表
           _currentResult = _items[(i + 1) % _items.length];
         } else {
-          // 最後一步：顯示最終結果
           _currentResult = finalResult;
         }
       });
@@ -100,7 +89,41 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       _currentResult = finalResult; // 確保最後狀態是最終結果
     });
 
-    // TODO: 下一步將在這裡加入資料庫儲存邏輯
+    // 🎯 核心變更: 加入資料庫儲存邏輯
+    final int? userNum = globals.currentUserNum;
+    if (userNum == null) {
+      _showResultDialog(context, '錯誤', '找不到登入者資訊，無法儲存結果。');
+      return;
+    }
+
+    // 1. 查找對應的 GiftTheme 物件以取得 code
+    final List<GiftTheme> matchedThemes = globals.globalGiftThemes
+        .where((theme) => theme.name == finalResult)
+        .toList();
+
+    final String themeCode = matchedThemes.isNotEmpty ? matchedThemes.first.code : '';
+
+    if (themeCode.isEmpty) {
+      _showResultDialog(context, '錯誤', '找不到對應的主題代碼，無法儲存結果。');
+      return;
+    }
+
+    // 4. 呼叫全域更新函數
+    try {
+      // 假設 updateParticipantAssignedTheme 返回 Future<bool>
+      final success = await globals.updateParticipantAssignedTheme(userNum, themeCode);
+
+      if (success != null) {
+        // 成功後顯示結果
+        _showResultDialog(context, '🎉 抽獎結果已儲存！', '您的主題是：$finalResult');
+      } else {
+        // 更新失敗 (可能因為資料庫操作失敗或主題已被分配過)
+        _showResultDialog(context, '錯誤', '儲存結果失敗。可能已分配過主題或發生資料庫錯誤。');
+      }
+    } catch (e) {
+      // 資料庫操作異常
+      _showResultDialog(context, '資料庫錯誤', '儲存結果時發生異常: $e');
+    }
   }
 
   // ----------------------------------------------------
