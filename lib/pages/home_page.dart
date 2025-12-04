@@ -11,6 +11,9 @@ import '../widgets/countdown_widget.dart' show defaultEventTime;
 import '../widgets/location.dart';
 import '../globals.dart' as globals;
 
+// 🎯 引入新的抽籤 Widget
+import '../widgets/lucky_draw_widget.dart';
+
 
 // ====================================================================
 // 🎁 活動資料與常數結構 (Event Data and Constants)
@@ -157,7 +160,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 實作拉霸機視窗彈出與遮罩
+  // 實作拉霸機視窗彈出與遮罩 (對應「請選擇」)
   void _showSlotMachineDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -181,6 +184,32 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+  // 🎯 新增的抽籤視窗彈出與遮罩 (對應「你猜猜」)
+  void _showLuckyDrawDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true, // 點擊視窗外可關閉
+      barrierLabel: 'LuckyDraw',
+      barrierColor: Colors.black.withOpacity(0.7),
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionBuilder: (context, a1, a2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: a1,
+            curve: Curves.easeOutBack,
+          ),
+          child: child,
+        );
+      },
+      pageBuilder: (context, a1, a2) {
+        return const Center(
+          child: LuckyDrawWidget(), // 🎯 使用新的 Widget
+        );
+      },
+    );
+  }
+
 
   // 實作地點選擇視窗
   Future<void> _showLocationDialog(BuildContext context) async {
@@ -225,11 +254,13 @@ class _HomePageState extends State<HomePage> {
           ResponsiveLayout(
             mobile: _MobileBody(
               showSlotMachineDialog: _showSlotMachineDialog,
+              showLuckyDrawDialog: _showLuckyDrawDialog, // 🎯 傳遞新的函式
               showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
             desktop: _DesktopBody(
               showSlotMachineDialog: _showSlotMachineDialog,
+              showLuckyDrawDialog: _showLuckyDrawDialog, // 🎯 傳遞新的函式
               showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
@@ -246,10 +277,12 @@ class _HomePageState extends State<HomePage> {
 // ====================================================================
 class _MobileBody extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _MobileBody({
     required this.showSlotMachineDialog,
+    required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
   });
@@ -316,6 +349,7 @@ class _MobileBody extends StatelessWidget {
                   child: _buildInfoContent(
                     context,
                     showSlotMachineDialog,
+                    showLuckyDrawDialog, // 🎯 傳遞新的函式
                     showLocationDialog,
                     isMobile: true,
                   ),
@@ -337,10 +371,12 @@ class _MobileBody extends StatelessWidget {
 // ====================================================================
 class _DesktopBody extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _DesktopBody({
     required this.showSlotMachineDialog,
+    required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
   });
@@ -349,6 +385,7 @@ class _DesktopBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return _DesktopMainLayout(
       showSlotMachineDialog: showSlotMachineDialog,
+      showLuckyDrawDialog: showLuckyDrawDialog, // 🎯 傳遞新的函式
       showLocationDialog: showLocationDialog,
       authenticatedUser: authenticatedUser,
     );
@@ -361,10 +398,12 @@ class _DesktopBody extends StatelessWidget {
 // ====================================================================
 class _DesktopMainLayout extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLuckyDrawDialog; // 🎯 新增
   final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
   const _DesktopMainLayout({
     required this.showSlotMachineDialog,
+    required this.showLuckyDrawDialog, // 🎯 新增
     required this.showLocationDialog,
     this.authenticatedUser,
   });
@@ -430,6 +469,7 @@ class _DesktopMainLayout extends StatelessWidget {
                   child: _buildInfoContent(
                     context,
                     showSlotMachineDialog,
+                    showLuckyDrawDialog, // 🎯 傳遞新的函式
                     showLocationDialog,
                     isMobile: false,
                   ),
@@ -495,11 +535,43 @@ Widget _buildEventInfoSection(
   );
 }
 
-// 2. 活動須知區塊 (包含點擊事件) - 🎯 已修改按鈕樣式
-Widget _buildRequirementSection(BuildContext context, Function(BuildContext) showSlotMachineDialog, TextStyle titleStyle, TextStyle contentStyle, double sectionSpacing) {
+// 2. 活動須知區塊 (包含點擊事件) - 🎯 包含「請選擇」和「你猜猜」兩個按鈕
+Widget _buildRequirementSection(
+    BuildContext context,
+    Function(BuildContext) showSlotMachineDialog,
+    Function(BuildContext) showLuckyDrawDialog, // 🎯 新增的函式參數
+    TextStyle titleStyle,
+    TextStyle contentStyle,
+    double sectionSpacing
+    ) {
   // 定義紅色字體的樣式，繼承自 contentStyle
   final TextStyle redContentStyle = contentStyle.copyWith(
     color: Colors.red.shade700,
+  );
+
+  // 🌟 共享按鈕的樣式設定
+  final ButtonStyle customButtonStyle = OutlinedButton.styleFrom(
+    // 1. 紅底
+    backgroundColor: Colors.red.shade700,
+    // 2. 圓形按鈕
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20), // 設置大圓角
+    ),
+    // 3. 金色邊框 (使用 side)
+    side: BorderSide(
+      color: Colors.yellow.shade700!, // 金色
+      width: 2,
+    ),
+    // 減少 padding 以符合小按鈕
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+  );
+
+  // 🌟 共享文字樣式設定
+  const TextStyle customButtonTextStyle = TextStyle(
+    // 5. 綠字
+    color: Colors.green, // 綠色
+    fontWeight: FontWeight.bold,
+    fontSize: 14, // 適合小按鈕的字體大小
   );
 
   return Column(
@@ -511,42 +583,39 @@ Widget _buildRequirementSection(BuildContext context, Function(BuildContext) sho
       Text(eventData.infoDressCode, style: contentStyle), // 顯示 Dress Code
       SizedBox(height: sectionSpacing / 4),
 
-      // 禮物主題 (點擊事件，彈出拉霸機) - 🌟 新的金色邊框、紅底、綠字圓形按鈕
+      // 禮物主題 (包含兩個按鈕)
       Row(
         crossAxisAlignment: CrossAxisAlignment.center, // 讓文字和按鈕居中對齊
         children: [
           // 禮物主題文字
           Text(eventData.infoGiftPrefix, style: contentStyle),
-          const SizedBox(width: 8), // 增加間隔
+          const SizedBox(width: 8), // 間隔
 
-          // 🌟 新按鈕實作: OutlinedButton for custom style
+          // 1. 「請選擇」按鈕 (觸發 SlotMachine)
           SizedBox(
             height: 30, // 限制按鈕高度
             child: OutlinedButton(
               onPressed: () => showSlotMachineDialog(context),
-              style: OutlinedButton.styleFrom(
-                // 1. 紅底
-                backgroundColor: Colors.red.shade700,
-                // 2. 圓形按鈕
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20), // 設置大圓角
-                ),
-                // 3. 金色邊框 (使用 side)
-                side: BorderSide(
-                  color: Colors.yellow.shade700!, // 金色
-                  width: 2,
-                ),
-                // 減少 padding 以符合小按鈕
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              ),
+              style: customButtonStyle,
               child: const Text(
-                '請選擇', // 4. 文字改為「請選擇」
-                style: TextStyle(
-                  // 5. 綠字
-                  color: Colors.green, // 明亮的綠色
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14, // 適合小按鈕的字體大小
-                ),
+                '請選擇',
+                style: customButtonTextStyle,
+              ),
+            ),
+          ),
+
+          // 2. 兩個按鈕之間的間隔
+          const SizedBox(width: 8),
+
+          // 3. 「你猜猜」按鈕 (🎯 觸發 LuckyDraw)
+          SizedBox(
+            height: 30, // 限制按鈕高度
+            child: OutlinedButton(
+              onPressed: () => showLuckyDrawDialog(context), // 🎯 呼叫新的函式
+              style: customButtonStyle,
+              child: const Text(
+                '你猜猜',
+                style: customButtonTextStyle,
               ),
             ),
           ),
@@ -587,6 +656,7 @@ Widget _buildProcessSection(TextStyle titleStyle, TextStyle contentStyle, double
 Widget _buildInfoContent(
     BuildContext context,
     Function(BuildContext) showSlotMachineDialog,
+    Function(BuildContext) showLuckyDrawDialog, // 🎯 新增參數
     Function(BuildContext) showLocationDialog, {
       required bool isMobile,
     }) {
@@ -620,6 +690,7 @@ Widget _buildInfoContent(
       _buildRequirementSection(
         context,
         showSlotMachineDialog,
+        showLuckyDrawDialog, // 🎯 傳遞新的函式
         titleStyle,
         contentStyle,
         sectionSpacing,
