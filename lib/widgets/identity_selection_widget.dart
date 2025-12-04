@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
 import '../repositories/database_repository.dart';
 import '../models/participant_model.dart';
+import '../globals.dart' as globals;
+
 
 // ====================================================================
 // 🔴 IdentitySelectionWidget (身份選擇器)
@@ -118,6 +120,10 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
 
     void handleSubmission(String passcode) {
       if (passcode == participant.verificationCode) {
+
+        // ✅ 登入成功，記錄 num
+        globals.currentUserNum = participant.num;
+
         Navigator.of(context).pop();
         widget.onVerified(participant.fullName);
       } else {
