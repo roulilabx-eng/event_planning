@@ -10,6 +10,7 @@ class Participant {
   final DateTime createdAt; // 創建時間 (created_at)
   final String? giftAssignedTheme; // 分配到的禮物主題名稱 (gift_assigned_theme)
   final String? location; // 用餐地點 (location)
+  final bool isPresent; // 是否在場 (is_present) <-- 新增欄位
 
   // ----------------------------------------
   // 1. 靜態私有共享實例
@@ -29,6 +30,7 @@ class Participant {
     required this.createdAt,
     this.giftAssignedTheme,
     this.location,
+    this.isPresent = true, // 預設為 true
   });
 
   // ----------------------------------------
@@ -46,6 +48,7 @@ class Participant {
         createdAt: DateTime.fromMillisecondsSinceEpoch(0),
         giftAssignedTheme: null,
         location: null,
+        isPresent: false, // 共享實例預設為 false
       );
     }
     return _sharedInstance!;
@@ -64,6 +67,7 @@ class Participant {
     required DateTime createdAt,
     String? giftAssignedTheme,
     String? location,
+    bool isPresent = false,
   }) {
     return Participant.instance(
       id: id,
@@ -75,6 +79,7 @@ class Participant {
       createdAt: createdAt,
       giftAssignedTheme: giftAssignedTheme,
       location: location,
+      isPresent: isPresent,
     );
   }
 
@@ -83,6 +88,11 @@ class Participant {
   // ----------------------------------------
   factory Participant.fromJson(Map<String, dynamic> json) {
     try {
+      // 安全解析 is_present: 接受 boolean 或 integer (1/0)，若無值則預設為 true
+      final bool parsedIsPresent = json['is_present'] is bool
+          ? json['is_present'] as bool
+          : (json['is_present'] == 1 || json['is_present'] == '1');
+
       return Participant.instance(
         id: json['id'] is int ? json['id'] : int.tryParse('${json['id']}') ?? 0,
         num: json['num'] is int ? json['num'] : int.tryParse('${json['num']}') ?? 0,
@@ -93,6 +103,7 @@ class Participant {
         createdAt: _parseDateTimeSafe(json['created_at']) ?? DateTime.now(),
         giftAssignedTheme: json['gift_assigned_theme']?.toString(),
         location: json['location']?.toString(),
+        isPresent: json.containsKey('is_present') ? parsedIsPresent : true, // 若 key 不存在，預設為 true
       );
     } catch (e) {
       // 解析失敗時返回 shared instance
@@ -115,6 +126,7 @@ class Participant {
       'created_at': createdAt.toUtc().toIso8601String(),
       'gift_assigned_theme': giftAssignedTheme,
       'location': location,
+      'is_present': isPresent, // <-- 新增欄位
     };
   }
 

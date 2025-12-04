@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:just_audio/just_audio.dart'; // 保持這個引入，因為我們需要它的類型
 import 'dart:math';
 import 'repositories/database_repository.dart'; // 引入 Repository
 import 'pages/home_page.dart';
+import '../audio_service.dart'; // 🔴 引入全域音訊服務檔案
 
 // ============================================================
 // ⭐ 應用程式啟動與初始化
@@ -10,15 +11,6 @@ import 'pages/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 🔴 1. 初始化 Supabase 客戶端 (使用 database_repository.dart 中的配置)
-  // try {
-  //   await DatabaseRepository.initialize();
-  //   debugPrint('Supabase 初始化成功！');
-  // } catch (e) {
-  //   debugPrint('Supabase 初始化失敗: $e');
-  //   // 可以在此處顯示一個錯誤頁面或日誌，但不阻擋應用啟動
-  // }
 
   // 🏆 初始化 Supabase 連線 🏆
   await DatabaseRepository.initializeSupabase();
@@ -28,7 +20,8 @@ Future<void> main() async {
 
 
 // ============================================================
-// ⭐ 主 App (整合音樂播放邏輯)
+// ⭐ 主 App (整合全域音樂服務)
+// - 移除音樂相關的狀態和方法，改用 GlobalAudioService。
 // ============================================================
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -38,51 +31,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late AudioPlayer _player;
-  final Random _random = Random();
-
-  // 🔴 背景音樂資源列表
-  final List<String> _audioAssets = [
-    'assets/audio/jingle_bells.mp3',
-    'assets/audio/silent_night.mp3',
-    'assets/audio/deck_the_halls.mp3',
-    'assets/audio/we_wish_you.mp3',
-    'assets/audio/frosty_the_snowman.mp3',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _player = AudioPlayer();
-    // 啟動音樂播放
-    _playRandomMusic();
-  }
-
-  /// 🔴 隨機播放背景音樂 (循環播放)
-  Future<void> _playRandomMusic() async {
-    try {
-      while (mounted) {
-        final index = _random.nextInt(_audioAssets.length);
-
-        // 設定播放資源
-        await _player.setAsset(_audioAssets[index]);
-        await _player.play();
-
-        // 等待當前歌曲播放完成
-        await _player.playerStateStream.firstWhere(
-              (state) => state.processingState == ProcessingState.completed,
-        );
-      }
-    } catch (e) {
-      debugPrint("播放音樂失敗: $e");
-    }
-  }
+  // 🔴 移除所有音樂相關的狀態變數
 
   @override
   void dispose() {
-    _player.dispose(); // 釋放音樂播放器資源
+    // 🔴 釋放全域 AudioService 資源
+    GlobalAudioService().dispose();
     super.dispose();
   }
+
+  // 🔴 移除 _playRandomMusic 方法
 
   // 由於我們改用 ResponsiveLayout，AppLayout 和 Transform.scale 結構被移除
   @override
@@ -96,11 +54,9 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
 
-      // 使用 HomePage 作為應用程式的起始頁
+      // 🔴 直接使用 HomePage 作為應用程式的起始頁
+      // 移除 GestureDetector，將音樂啟動的責任移交給 HomePage 內部元件。
       home: const HomePage(),
-
-      // 注意：AppLayout 和 Transform.scale 的全域縮放功能已在
-      // responsive_layout.dart 和 home_page.dart 內部的 RWD 邏輯取代。
     );
   }
 }

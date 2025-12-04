@@ -3,7 +3,7 @@ import 'dart:math';
 import '../repositories/database_repository.dart';
 import '../models/participant_model.dart';
 import '../globals.dart' as globals;
-
+import '../audio_service.dart'; // 🔴 導入 GlobalAudioService
 
 // ====================================================================
 // 🔴 IdentitySelectionWidget (身份選擇器)
@@ -125,6 +125,9 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
 
         // ✅ 登入成功，記錄 num
         globals.currentUserNum = participant.num;
+
+        // 🔴 播放背景音樂 (解決 Web Autoplay 限制)
+        GlobalAudioService().startMusic();
 
         // ✅ 寫入登入時間到資料表
         try {
