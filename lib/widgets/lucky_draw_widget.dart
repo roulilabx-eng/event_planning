@@ -159,10 +159,52 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   }
 
   // ----------------------------------------------------
-  // 模組 3: 底部動作區 (START 按鈕)
+  // 模組 4: 顯示結果彈窗 (新增)
   // ----------------------------------------------------
-  Widget _buildAction() {
-    return ElevatedButton(
+  void _showResultDialog(BuildContext context, String result) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(color: Colors.red.shade700, width: 4),
+          ),
+          title: const Center(
+            child: Text('抽取結果', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+          ),
+          content: Text(
+            result,
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.red.shade900),
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 4,
+              ),
+              child: const Text('我知道了', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ----------------------------------------------------
+  // 模組 3: 底部動作區 (START 按鈕 + 結果按鈕) - 調整為 Row
+  // ----------------------------------------------------
+  Widget _buildAction(BuildContext context) {
+    // START Button
+    final startButton = ElevatedButton(
       // 抽獎中時禁用按鈕
       onPressed: _isDrawing ? null : _startDraw,
       style: ElevatedButton.styleFrom(
@@ -181,6 +223,39 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
         _isDrawing ? '拉霸中...' : 'ＳＴＡＲＴ',
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
+    );
+
+    // Result Button (新增)
+    final resultButton = Container(
+      margin: const EdgeInsets.only(left: 15.0), // 留出與 START 按鈕的間距
+      child: ElevatedButton(
+        // 抽獎中時禁用按鈕
+        onPressed: _isDrawing ? null : () => _showResultDialog(context, _currentResult),
+        style: ElevatedButton.styleFrom(
+          // 🎯 圓形設定
+          shape: const CircleBorder(
+            side: BorderSide(color: Colors.red, width: 3.0), // 紅色框線
+          ),
+          padding: const EdgeInsets.all(15),
+          backgroundColor: Colors.yellow.shade200, // 黃色底色
+          elevation: 6,
+          shadowColor: Colors.black54,
+          foregroundColor: Colors.black, // 確保文字/圖標顏色可見
+        ),
+        child: const Text(
+          '🎁',
+          style: TextStyle(fontSize: 30),
+        ),
+      ),
+    );
+
+    // 使用 Row 讓兩個按鈕並排，並使用 MainAxisSize.min 確保 Row 寬度只包含按鈕，這樣 Center 才能正確置中按鈕組
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        startButton,
+        resultButton,
+      ],
     );
   }
 
@@ -228,13 +303,12 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
 
                     // 分隔線
                     const Divider(color: Colors.white, thickness: 1.5),
-                    // 🎯 移除 SizedBox(height: 16)，將間距控制轉移到 _buildSlotMachine 的 margin
 
                     // 🎯 2. 拉霸機 UI 模組
                     _buildSlotMachine(),
 
                     // 3. 動作按鈕區塊 (居中顯示)
-                    Center(child: _buildAction()),
+                    Center(child: _buildAction(context)), // 傳入 context 以便顯示彈窗
                   ],
                 ),
               ),
