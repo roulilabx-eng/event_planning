@@ -50,20 +50,16 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
   }
 
   // ===============================================================
-  // 🔹 2️⃣ 取得 participant 對應的圖片路徑 (支援 png/jpg/jpeg)
+  // 🔹 2️⃣ 取得 participant 對應的圖片路徑 (✔ 只讀取 jpg)
   // ===============================================================
   Future<String> _getAvatarImagePath(int num) async {
-    const extensions = ['png', 'jpg', 'jpeg'];
-    for (var ext in extensions) {
-      final path = 'assets/images/people/$num.$ext';
-      try {
-        await rootBundle.load(path); // 嘗試載入 asset
-        return path;
-      } catch (_) {
-        continue;
-      }
+    final path = 'assets/images/people/$num.jpg';
+    try {
+      await rootBundle.load(path); // 嘗試載入 asset (.jpg)
+      return path;
+    } catch (_) {
+      return 'assets/images/people/default.jpg'; // fallback 預設圖片
     }
-    return 'assets/images/people/default.jpg'; // fallback 預設圖片
   }
 
   // ===============================================================
