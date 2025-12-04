@@ -9,6 +9,7 @@ class Participant {
   final DateTime? loginTime; // 報到時間 (login_time)
   final DateTime createdAt; // 創建時間 (created_at)
   final String? giftAssignedTheme; // 分配到的禮物主題名稱 (gift_assigned_theme)
+  final String? location; // 用餐地點 (location)
 
   // ----------------------------------------
   // 1. 靜態私有共享實例
@@ -27,6 +28,7 @@ class Participant {
     this.loginTime,
     required this.createdAt,
     this.giftAssignedTheme,
+    this.location,
   });
 
   // ----------------------------------------
@@ -43,6 +45,7 @@ class Participant {
         loginTime: null,
         createdAt: DateTime.fromMillisecondsSinceEpoch(0),
         giftAssignedTheme: null,
+        location: null,
       );
     }
     return _sharedInstance!;
@@ -60,6 +63,7 @@ class Participant {
     DateTime? loginTime,
     required DateTime createdAt,
     String? giftAssignedTheme,
+    String? location,
   }) {
     return Participant.instance(
       id: id,
@@ -70,6 +74,7 @@ class Participant {
       loginTime: loginTime,
       createdAt: createdAt,
       giftAssignedTheme: giftAssignedTheme,
+      location: location,
     );
   }
 
@@ -87,6 +92,7 @@ class Participant {
         loginTime: _parseDateTimeSafe(json['login_time']),
         createdAt: _parseDateTimeSafe(json['created_at']) ?? DateTime.now(),
         giftAssignedTheme: json['gift_assigned_theme']?.toString(),
+        location: json['location']?.toString(),
       );
     } catch (e) {
       // 解析失敗時返回 shared instance
@@ -108,6 +114,7 @@ class Participant {
       'login_time': loginTime?.toIso8601String(),
       'created_at': createdAt.toUtc().toIso8601String(),
       'gift_assigned_theme': giftAssignedTheme,
+      'location': location,
     };
   }
 

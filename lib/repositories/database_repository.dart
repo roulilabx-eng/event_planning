@@ -130,7 +130,7 @@ class DatabaseRepository {
       final response = await _supabase
           .from('participants')
           .select(
-        'id, num, sort, full_name, verification_code, login_time, created_at, gift_assigned_theme',
+        'id, num, sort, full_name, verification_code, login_time, created_at, gift_assigned_theme, location',
       )
           .order('sort', ascending: true)
           .limit(100); // 可以依需求調整
@@ -166,6 +166,34 @@ class DatabaseRepository {
       print('✅ Updated participant $num with theme $themeCode, response: $response');
     } catch (e, st) {
       print('❌ Exception updating participant: $e\n$st');
+      rethrow;
+    }
+  }
+
+  /// 更新 participant 的 login_time 欄位為現在時間
+  static Future<void> updateParticipantLoginTime(int num, DateTime loginTime) async {
+    try {
+      final response = await _supabase
+          .from('participants')
+          .update({'login_time': loginTime.toIso8601String()})
+          .eq('num', num);
+      print('✅ Updated participant $num login_time, response: $response');
+    } catch (e, st) {
+      print('❌ Exception updating participant login_time: $e\n$st');
+      rethrow;
+    }
+  }
+
+  /// 更新 participant 的 location 欄位
+  static Future<void> updateParticipantLocation(int num, String location) async {
+    try {
+      final response = await _supabase
+          .from('participants')
+          .update({'location': location})
+          .eq('num', num);
+      print('✅ Updated participant $num location = $location, response: $response');
+    } catch (e, st) {
+      print('❌ Exception updating participant location: $e\n$st');
       rethrow;
     }
   }

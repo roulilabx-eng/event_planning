@@ -120,11 +120,21 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
   void _showCodeDialog(BuildContext context, Participant participant) {
     final codeController = TextEditingController();
 
-    void handleSubmission(String passcode) {
+    Future<void> handleSubmission(String passcode) async {
       if (passcode == participant.verificationCode) {
 
         // ✅ 登入成功，記錄 num
         globals.currentUserNum = participant.num;
+
+        // ✅ 寫入登入時間到資料表
+        try {
+          await DatabaseRepository.updateParticipantLoginTime(
+            participant.num,
+            DateTime.now(),
+          );
+        } catch (_) {
+          // 若寫入失敗，不阻擋使用流程，只在 console 記錄
+        }
 
         Navigator.of(context).pop();
         widget.onVerified(participant.fullName);
@@ -185,7 +195,7 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
             child: TextField(
               controller: codeController,
               keyboardType: TextInputType.number,
-              onSubmitted: handleSubmission,
+              onSubmitted: (value) => handleSubmission(value),
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: '請輸入',
