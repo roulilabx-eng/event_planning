@@ -115,10 +115,10 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
 
       if (success != null) {
         // 成功後顯示結果
-        _showResultDialog(context, '🎉 抽獎結果已儲存！', '您的主題是：$finalResult');
+        _showResultDialog(context, '🎉 你的專屬主題 🎉', '$finalResult');
       } else {
         // 更新失敗 (可能因為資料庫操作失敗或主題已被分配過)
-        _showResultDialog(context, '錯誤', '儲存結果失敗。可能已分配過主題或發生資料庫錯誤。');
+        _showResultDialog(context, '失敗', '請重新再試一次。');
       }
     } catch (e) {
       // 資料庫操作異常
@@ -134,7 +134,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       child: Padding(
         padding: EdgeInsets.only(bottom: 8.0),
         child: Text(
-          '🎰 主題你來選 🎰', // 標題文字
+          '🎰 幸運主題 🎰', // 標題文字
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w900,
@@ -248,7 +248,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   // ----------------------------------------------------
   void _checkGiftStatus(BuildContext context) async {
     String content = '目前沒有任何紀錄';
-    String title = '主題紀錄';
+    String title = '🎉 你的專屬主題 🎉';
 
     // 1. 取得目前登入者的 numId
     final int? userNum = globals.currentUserNum;
@@ -262,7 +262,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
         final String? themeCode = participant?.giftAssignedTheme;
 
         if (themeCode != null && themeCode.isNotEmpty) {
-          title = '您的已分配主題';
+          title = '🎉 你的專屬主題 🎉';
 
           // 🎯 核心邏輯: 查找全域主題列表，將代碼轉換為名稱
           // 假設 GiftTheme 類別有 'code' (用於比對) 和 'name' (用於顯示) 屬性
@@ -312,7 +312,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       ),
       child: Text(
         // 根據狀態顯示不同文字
-        _isDrawing ? '拉霸中...' : 'ＳＴＡＲＴ',
+        _isDrawing ? '.ing...' : 'ＳＴＡＲＴ',
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
