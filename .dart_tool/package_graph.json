@@ -44,6 +44,13 @@
       ]
     },
     {
+      "name": "flutter_screenutil",
+      "version": "5.9.3",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
       "name": "just_audio",
       "version": "0.9.46",
       "dependencies": [
@@ -757,13 +764,6 @@
       "version": "1.0.1",
       "dependencies": [
         "web"
-      ]
-    },
-    {
-      "name": "flutter_screenutil",
-      "version": "5.9.3",
-      "dependencies": [
-        "flutter"
       ]
     }
   ],

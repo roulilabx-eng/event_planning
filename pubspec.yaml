@@ -61,6 +61,17 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/images/people/default.jpg
+    - assets/images/people/993106.jpg
+    - assets/images/people/993109.jpg
+    - assets/images/people/993120.jpg
+    - assets/images/people/993128.jpg
+    - assets/images/people/993135.jpg
+    - assets/images/people/999999.jpg
+    - assets/images/people/999998.jpg
+    - assets/images/people/999997.jpg
+    - assets/images/people/999996.jpg
+
     - assets/images/slot_machine_bg.jpg
     - assets/images/test.png
     - assets/images/christmas_bg.jpg
