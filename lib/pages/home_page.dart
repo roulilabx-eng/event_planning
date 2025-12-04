@@ -8,6 +8,7 @@ import '../widgets/snow_effect.dart';
 import '../widgets/identity_selection_widget.dart';
 // 引入 defaultEventTime，確保它可以被 CountdownWidget 成功調用
 import '../widgets/countdown_widget.dart' show defaultEventTime;
+import '../widgets/location.dart';
 import '../globals.dart' as globals;
 
 
@@ -20,21 +21,21 @@ class EventData {
   final String mainTitle = '🎁 聖誕 Ｘ 猜謎 Ｘ 交換禮物 🎁'; // 這裡不再是歡迎語，而是活動主標題
 
   final String infoTitle1 = '🎄 活動資訊 🎄';
-  final String infoTheme = '主題｜再不猜謎就瘋狂：身體小小、頭腦一級棒';
-  final String infoTime = '時間｜2025/12/24（三）19:00';
+  final String infoTheme = '主題｜再不猜謎就瘋狂 - 真相只有一個 ☝️';
+  final String infoTime = '時間｜2025/12/24（三）';
   final String infoLocation = '地點｜海底撈';
 
   final String infoTitle2 = '🔔 活動須知 🔔';
-  final String infoDressCode = 'Dress Code｜聖誕風-紅綠穿搭 <-小黑人強力要求';
+  final String infoDressCode = 'Dress Code｜聖誕紅綠穿搭  🚨小黑人強力要求 🚨';
   final String infoGiftPrefix = '禮物主題｜';
   final String infoGiftClick = '請點擊';
   final String infoGiftAmount = '禮物金額｜300 up up';
 
-  final String infoQA = '禮物猜謎｜請準備1個約5分鐘內可以完成的猜謎，必須有明確答案且控制在A4大小內';
-  final String infoQA_detail = '(類型不限：謎語 / 腦筋急轉彎 / 密碼題 / 邏輯小問答 / 搞怪題)';
+  final String infoQA = '禮物猜謎｜請準備 1 個 5分鐘 內可以完成的猜謎';
+  final String infoQA_detail = '必須有明確答案且題目道具或紙張小於A4\n(類型不限：謎語 / 腦筋急轉彎 / 動手做 / 搞怪題)';
 
   final String infoTitle3 = '🎉 活動流程 🎉';
-  final String processStep1 = '入場 & 報到（工作人員會收集個人的謎題)';
+  final String processStep1 = '入場 & 報到（工作人員會收集謎題)';
   final String processStep2 = '聖誕大餐';
   final String processStep3 = '交換禮物 & 遊戲環節';
 
@@ -182,6 +183,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // 實作地點選擇視窗
+  Future<void> _showLocationDialog(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const LocationDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,10 +226,12 @@ class _HomePageState extends State<HomePage> {
           ResponsiveLayout(
             mobile: _MobileBody(
               showSlotMachineDialog: _showSlotMachineDialog,
+              showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
             desktop: _DesktopBody(
               showSlotMachineDialog: _showSlotMachineDialog,
+              showLocationDialog: _showLocationDialog,
               authenticatedUser: _authenticatedUser,
             ),
           ),
@@ -235,8 +247,13 @@ class _HomePageState extends State<HomePage> {
 // ====================================================================
 class _MobileBody extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
-  const _MobileBody({required this.showSlotMachineDialog, this.authenticatedUser});
+  const _MobileBody({
+    required this.showSlotMachineDialog,
+    required this.showLocationDialog,
+    this.authenticatedUser,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +314,12 @@ class _MobileBody extends StatelessWidget {
             child: Column(
               children: [
                 _InfoSectionContainer(
-                  child: _buildInfoContent(context, showSlotMachineDialog, isMobile: true),
+                  child: _buildInfoContent(
+                    context,
+                    showSlotMachineDialog,
+                    showLocationDialog,
+                    isMobile: true,
+                  ),
                 ),
                 // 增加底部留白，讓滾動更順暢
                 const SizedBox(height: 100.0),
@@ -316,13 +338,19 @@ class _MobileBody extends StatelessWidget {
 // ====================================================================
 class _DesktopBody extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
-  const _DesktopBody({required this.showSlotMachineDialog, this.authenticatedUser});
+  const _DesktopBody({
+    required this.showSlotMachineDialog,
+    required this.showLocationDialog,
+    this.authenticatedUser,
+  });
 
   @override
   Widget build(BuildContext context) {
     return _DesktopMainLayout(
       showSlotMachineDialog: showSlotMachineDialog,
+      showLocationDialog: showLocationDialog,
       authenticatedUser: authenticatedUser,
     );
   }
@@ -334,8 +362,13 @@ class _DesktopBody extends StatelessWidget {
 // ====================================================================
 class _DesktopMainLayout extends StatelessWidget {
   final Function(BuildContext) showSlotMachineDialog;
+  final Function(BuildContext) showLocationDialog;
   final String? authenticatedUser;
-  const _DesktopMainLayout({required this.showSlotMachineDialog, this.authenticatedUser});
+  const _DesktopMainLayout({
+    required this.showSlotMachineDialog,
+    required this.showLocationDialog,
+    this.authenticatedUser,
+  });
 
   static const double maxWidth = 1000.0;
 
@@ -395,7 +428,12 @@ class _DesktopMainLayout extends StatelessWidget {
                 // 2. 資訊區域
                 // ----------------------------------------------------
                 _InfoSectionContainer(
-                  child: _buildInfoContent(context, showSlotMachineDialog, isMobile: false),
+                  child: _buildInfoContent(
+                    context,
+                    showSlotMachineDialog,
+                    showLocationDialog,
+                    isMobile: false,
+                  ),
                 ),
               ],
             ),
@@ -412,7 +450,13 @@ class _DesktopMainLayout extends StatelessWidget {
 // ====================================================================
 
 // 1. 活動資訊區塊
-Widget _buildEventInfoSection(TextStyle titleStyle, TextStyle contentStyle, double sectionSpacing) {
+Widget _buildEventInfoSection(
+  BuildContext context,
+  TextStyle titleStyle,
+  TextStyle contentStyle,
+  double sectionSpacing,
+  Function(BuildContext) showLocationDialog,
+) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -420,7 +464,34 @@ Widget _buildEventInfoSection(TextStyle titleStyle, TextStyle contentStyle, doub
       SizedBox(height: sectionSpacing / 2),
       Text(eventData.infoTheme, style: contentStyle),
       Text(eventData.infoTime, style: contentStyle),
-      Text(eventData.infoLocation, style: contentStyle),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(eventData.infoLocation, style: contentStyle),
+          const SizedBox(width: 8),
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.yellow,
+
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+
+                side: const BorderSide(
+                  color: Colors.red, // 👈 設置您想要的框線顏色，例如紅色
+                  width: 2,          // 設置框線寬度，例如 2 像素
+                  // style: BorderStyle.solid, // 默認為 solid，可以省略
+                ),
+            ),
+            onPressed: () => showLocationDialog(context),
+            child: const Text(
+              '點點我',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
     ],
   );
 }
@@ -491,7 +562,12 @@ Widget _buildProcessSection(TextStyle titleStyle, TextStyle contentStyle, double
 // ====================================================================
 // 共用的活動資訊內容函式 (主要排版管理器)
 // ====================================================================
-Widget _buildInfoContent(BuildContext context, Function(BuildContext) showSlotMachineDialog, {required bool isMobile}) {
+Widget _buildInfoContent(
+  BuildContext context,
+  Function(BuildContext) showSlotMachineDialog,
+  Function(BuildContext) showLocationDialog, {
+  required bool isMobile,
+}) {
   const TextStyle titleStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.deepPurple);
 
   // 樣式調整：內文文字設為粗體，並加大 1 點
@@ -508,12 +584,24 @@ Widget _buildInfoContent(BuildContext context, Function(BuildContext) showSlotMa
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       // 🎄 活動資訊 🎄
-      _buildEventInfoSection(titleStyle, contentStyle, sectionSpacing),
+      _buildEventInfoSection(
+        context,
+        titleStyle,
+        contentStyle,
+        sectionSpacing,
+        showLocationDialog,
+      ),
 
       SizedBox(height: sectionSpacing),
 
       // 🔔 活動須知 🔔
-      _buildRequirementSection(context, showSlotMachineDialog, titleStyle, contentStyle, sectionSpacing),
+      _buildRequirementSection(
+        context,
+        showSlotMachineDialog,
+        titleStyle,
+        contentStyle,
+        sectionSpacing,
+      ),
 
       SizedBox(height: sectionSpacing),
 
