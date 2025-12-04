@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter/services.dart' show rootBundle;
 import '../repositories/database_repository.dart';
 import '../models/participant_model.dart';
 import '../globals.dart' as globals;
@@ -50,35 +49,42 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
   }
 
   // ===============================================================
-  // 🔹 2️⃣ 取得 participant 對應的圖片路徑 (✔ 只讀取 jpg)
+  // 🔹 2️⃣ 取得 participant 對應的圖片路徑 (同步判斷，避免 web 上 bundle 載入問題)
   // ===============================================================
-  Future<String> _getAvatarImagePath(int num) async {
-    final path = 'assets/images/people/$num.jpg';
-    try {
-      await rootBundle.load(path); // 嘗試載入 asset (.jpg)
-      return path;
-    } catch (_) {
-      return 'assets/images/people/default.jpg'; // fallback 預設圖片
+  String _getAvatarImagePath(int num) {
+    // 這些 num 對應的 jpg 檔已在 pubspec.yaml 中註冊
+    const availableNums = <int>{
+      993106,
+      993109,
+      993120,
+      993128,
+      993135,
+      999999,
+      999998,
+      999997,
+      999996,
+    };
+
+    if (availableNums.contains(num)) {
+      return 'assets/images/people/$num.jpg';
     }
+
+    // 其他未對應到的 num 一律使用預設頭像
+    return 'assets/images/people/default.jpg';
   }
 
   // ===============================================================
   // 🔹 3️⃣ 建立單個 Avatar
   // ===============================================================
   Widget _buildAvatar(Participant participant, double radius) {
-    return FutureBuilder<String>(
-      future: _getAvatarImagePath(participant.num),
-      builder: (context, snapshot) {
-        final imagePath = snapshot.data ?? 'assets/images/people/default.jpg';
-        return GestureDetector(
-          onTap: () => _showCodeDialog(context, participant),
-          child: CircleAvatar(
-            radius: radius,
-            backgroundColor: Colors.grey.shade300,
-            backgroundImage: AssetImage(imagePath),
-          ),
-        );
-      },
+    final imagePath = _getAvatarImagePath(participant.num);
+    return GestureDetector(
+      onTap: () => _showCodeDialog(context, participant),
+      child: CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.grey.shade300,
+        backgroundImage: AssetImage(imagePath),
+      ),
     );
   }
 

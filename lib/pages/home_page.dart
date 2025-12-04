@@ -8,7 +8,7 @@ import '../widgets/snow_effect.dart';
 import '../widgets/identity_selection_widget.dart';
 // 引入 defaultEventTime，確保它可以被 CountdownWidget 成功調用
 import '../widgets/countdown_widget.dart' show defaultEventTime;
-import '../models/gift_theme_model.dart';
+import '../globals.dart' as globals;
 
 
 // ====================================================================
@@ -107,6 +107,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // 🌟 在首頁啟動時預先載入禮物主題，後續開啟拉霸機可直接使用快取資料
+    globals.loadGiftThemesIfNeeded();
     // 🔴 頁面渲染完成後，自動彈出身份選擇視窗
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_authenticatedUser == null) {

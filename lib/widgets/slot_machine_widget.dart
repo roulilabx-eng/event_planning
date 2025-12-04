@@ -16,7 +16,14 @@ class SlotMachineController {
 
   Future<void> initialize() async {
     try {
-      themes = await DatabaseRepository.getGiftThemes();
+      // 優先使用首頁預先載入的全域快取，若尚未載入則在此補抓一次
+      if (globals.globalGiftThemesLoaded && globals.globalGiftThemes.isNotEmpty) {
+        themes = List<GiftTheme>.from(globals.globalGiftThemes);
+      } else {
+        themes = await DatabaseRepository.getGiftThemes();
+        globals.globalGiftThemes = List<GiftTheme>.from(themes);
+        globals.globalGiftThemesLoaded = true;
+      }
     } catch (e, st) {
       print('Error loading gift themes: $e\n$st');
     }
@@ -82,6 +89,43 @@ class SlotMachineDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 若尚未有主題資料，顯示佔位提示，避免除以 0
+    if (themes.isEmpty) {
+      return Container(
+        width: reelSize,
+        height: itemHeight,
+        decoration: BoxDecoration(
+          color: Colors.red.shade800,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.yellow.shade700, width: 6),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 10,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            color: Colors.white,
+            alignment: Alignment.center,
+            child: FittedBox(
+              child: Text(
+                '尚無可抽主題',
+                style: TextStyle(
+                  fontSize: reelSize * 0.12,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.red.shade900,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: reelSize,
       height: itemHeight,
@@ -157,11 +201,26 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
     if (!mounted) return;
 
     if (_controller.themes.isNotEmpty) {
+      // 根據使用者上次抽中的主題（若有），決定初始停留的 index
+      int initialIndex = 0;
+      if (_controller.lastAssignedThemeName != null) {
+        final matchedIndex = _controller.themes.indexWhere(
+          (t) => t.name == _controller.lastAssignedThemeName,
+        );
+        if (matchedIndex >= 0) {
+          initialIndex = matchedIndex;
+        }
+      }
+
+      _currentSlotIndex = initialIndex;
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.jumpTo(0); // 初始滾動到第一筆
-        setState(() {
-          _currentSlotIndex = 0;
-        });
+        // 等第一幀完成、_itemHeight 已計算好後，再捲動到對應位置
+        final double targetOffset = initialIndex * _itemHeight;
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(targetOffset);
+        }
+        setState(() {});
       });
     }
     setState(() {});
@@ -178,22 +237,47 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
 
     setState(() => _isSpinning = true);
 
-    const spinDurationSeconds = 3.5;
-    const fullReels = 50;
-
     final int themeCount = _controller.themes.length;
     final int finalResult = _controller.getRandomIndex();
 
-    // 計算最終 offset 精準對齊
+    // 1️⃣ 先把目前 offset 正規化到一個循環內，避免數值越滾越大造成精度問題
     final double cycleHeight = themeCount * _itemHeight;
-    final double targetOffset =
-        (fullReels * themeCount + finalResult) * _itemHeight;
+    double currentOffset =
+        _scrollController.hasClients ? _scrollController.offset : 0.0;
+    if (cycleHeight > 0) {
+      currentOffset = currentOffset % cycleHeight;
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(currentOffset);
+      }
+    }
+
+    // 當前對應的主題索引（就近取整）
+    final int currentIndex =
+        ((currentOffset / _itemHeight).round()) % themeCount;
+
+    // 2️⃣ 設定要多轉幾圈，模擬一般拉霸機「先快後慢」長時間轉動的感覺
+    const int minSpins = 3;
+    const int maxSpins = 6;
+    final int extraSpins =
+        minSpins + Random().nextInt(maxSpins - minSpins + 1); // 3~6 圈
+
+    // 確保目標 index 在目前 index 之後（往前轉），並加上額外圈數
+    int diff = finalResult - currentIndex;
+    if (diff <= 0) {
+      diff += themeCount;
+    }
+    final int totalSteps = extraSpins * themeCount + diff;
+    final double targetOffset = currentOffset + totalSteps * _itemHeight;
+
+    // 依照轉動圈數調整動畫時間
+    final double spinDurationSeconds = 1.5 + extraSpins * 0.4;
 
     try {
       await _scrollController.animateTo(
         targetOffset,
         duration: Duration(milliseconds: (spinDurationSeconds * 1000).toInt()),
-        curve: Curves.easeOutCubic,
+        // 由快到慢的減速曲線，模擬一般拉霸機收尾感
+        curve: Curves.decelerate,
       );
     } catch (_) {}
 
@@ -256,7 +340,8 @@ class _SlotMachineWidgetState extends State<SlotMachineWidget> {
     final screenWidth = MediaQuery.of(context).size.width;
     final double maxWidth = min(screenWidth * 0.9, 450.0);
     final double reelSize = maxWidth - 48;
-    _itemHeight = min(reelSize * 0.3, 80);
+    // 使用整數像素高度，避免捲動停止時出現半格錯位
+    _itemHeight = min(reelSize * 0.3, 80).floorToDouble().clamp(1.0, double.infinity);
 
     final double maxPopupHeight = MediaQuery.of(context).size.height * 0.6;
 

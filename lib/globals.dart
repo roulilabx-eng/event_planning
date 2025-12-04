@@ -2,9 +2,28 @@ library globals;
 
 import '../repositories/database_repository.dart';
 import '../models/participant_model.dart';
+import '../models/gift_theme_model.dart';
 import 'globals.dart' as globals;
 
 int? currentUserNum; // 紀錄目前登入者 numId
+
+/// 全域快取：禮物主題列表，供首頁預先載入、其他頁面共用
+List<GiftTheme> globalGiftThemes = [];
+bool globalGiftThemesLoaded = false;
+
+/// 在 App 生命週期中預先載入禮物主題（可在 HomePage.initState 呼叫）
+Future<void> loadGiftThemesIfNeeded() async {
+  if (globalGiftThemesLoaded) return;
+  try {
+    globalGiftThemes = await DatabaseRepository.getGiftThemes();
+    globalGiftThemesLoaded = true;
+    print('✅ Global gift themes loaded, count = ${globalGiftThemes.length}');
+  } catch (e, st) {
+    print('❌ Failed to load global gift themes: $e\n$st');
+    // 保持為未載入狀態，下次有需要時可再嘗試
+    globalGiftThemesLoaded = false;
+  }
+}
 
 /// 使用 num 取得 Participant
 Future<Participant?> getParticipantByNum(int num) async {

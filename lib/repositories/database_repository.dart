@@ -161,12 +161,9 @@ class DatabaseRepository {
           .update({'gift_assigned_theme': themeCode})
           .eq('num', num);
 
-      if (response.error != null) {
-        print('❌ Supabase update error: ${response.error!.message}');
-        throw Exception('Failed to update participant gift_assigned_theme');
-      } else {
-        print('✅ Updated participant $num with theme $themeCode');
-      }
+      // Supabase Dart v2 的 update 回傳通常是 List/Map，而不是帶 error 的物件
+      // 這裡僅簡單記錄回傳內容，實際專案可依需要再加強檢查
+      print('✅ Updated participant $num with theme $themeCode, response: $response');
     } catch (e, st) {
       print('❌ Exception updating participant: $e\n$st');
       rethrow;
