@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _player = AudioPlayer();
     // 啟動音樂播放
-    // _playRandomMusic();
+    _playRandomMusic();
   }
 
   /// 🔴 隨機播放背景音樂 (循環播放)
