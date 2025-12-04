@@ -63,7 +63,7 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
         continue;
       }
     }
-    return 'assets/images/people/default.png'; // fallback 預設圖片
+    return 'assets/images/people/default.jpg'; // fallback 預設圖片
   }
 
   // ===============================================================
@@ -73,7 +73,7 @@ class _IdentitySelectionWidgetState extends State<IdentitySelectionWidget> {
     return FutureBuilder<String>(
       future: _getAvatarImagePath(participant.num),
       builder: (context, snapshot) {
-        final imagePath = snapshot.data ?? 'assets/images/people/default.png';
+        final imagePath = snapshot.data ?? 'assets/images/people/default.jpg';
         return GestureDetector(
           onTap: () => _showCodeDialog(context, participant),
           child: CircleAvatar(
