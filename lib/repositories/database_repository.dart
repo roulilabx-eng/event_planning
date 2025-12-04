@@ -155,9 +155,22 @@ class DatabaseRepository {
 
   /// 更新 participant 的 gift_assigned_theme 欄位
   static Future<void> updateGiftAssignedTheme(int num, String themeCode) async {
-    // TODO: 實作資料庫更新邏輯
-    // 例如呼叫後端 API 或寫入本地資料
-    print('更新 participant $num 的 gift_assigned_theme 為 $themeCode');
+    try {
+      final response = await _supabase
+          .from('participants')
+          .update({'gift_assigned_theme': themeCode})
+          .eq('num', num);
+
+      if (response.error != null) {
+        print('❌ Supabase update error: ${response.error!.message}');
+        throw Exception('Failed to update participant gift_assigned_theme');
+      } else {
+        print('✅ Updated participant $num with theme $themeCode');
+      }
+    } catch (e, st) {
+      print('❌ Exception updating participant: $e\n$st');
+      rethrow;
+    }
   }
 
 // ----------------------------------------------------
