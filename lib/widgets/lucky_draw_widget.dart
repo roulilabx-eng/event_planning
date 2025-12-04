@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import '../globals.dart' as globals;
+// 🎯 引入正確的 Participant 模型
+import '../models/participant_model.dart';
+// 🎯 新增: 引入 GiftTheme 模型，以便處理全域列表
+import '../models/gift_theme_model.dart';
 
 // ====================================================================
 // 🎁 抽籤視窗主體 (已轉換為 StatefulWidget)
@@ -12,7 +17,7 @@ class LuckyDrawWidget extends StatefulWidget {
 }
 
 class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
-  // 🎯 抽獎項目列表 (假資料)
+  // 🎯 抽獎項目列表 (假資料) - ⚠️ 注意: 實際應使用 GiftTheme.code
   final List<String> _items = [
     '🎬 電影主題',
     '🗺️ 旅遊景點',
@@ -74,12 +79,14 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       });
     }
 
-    // 4. 完成
+    // 4. 完成動畫與 UI 更新
     if (!mounted) return;
     setState(() {
       _isDrawing = false;
       _currentResult = finalResult; // 確保最後狀態是最終結果
     });
+
+    // TODO: 下一步將在這裡加入資料庫儲存邏輯
   }
 
   // ----------------------------------------------------
@@ -159,9 +166,9 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   }
 
   // ----------------------------------------------------
-  // 模組 4: 顯示結果彈窗 (新增)
+  // 模組 4: 顯示結果彈窗 (通用彈窗)
   // ----------------------------------------------------
-  void _showResultDialog(BuildContext context, String result) {
+  void _showResultDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -170,12 +177,12 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
             borderRadius: BorderRadius.circular(15),
             side: BorderSide(color: Colors.red.shade700, width: 4),
           ),
-          title: const Center(
-            child: Text('抽取結果', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+          title: Center(
+            child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
           ),
           content: Text(
-            result,
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.red.shade900),
+            content,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.red.shade900),
             textAlign: TextAlign.center,
           ),
           actionsAlignment: MainAxisAlignment.center,
@@ -200,7 +207,55 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   }
 
   // ----------------------------------------------------
-  // 模組 3: 底部動作區 (START 按鈕 + 結果按鈕) - 調整為 Row
+  // 🎯 檢查禮物分配狀態並顯示彈窗 (已新增主題名稱轉換邏輯)
+  // ----------------------------------------------------
+  void _checkGiftStatus(BuildContext context) async {
+    String content = '目前沒有任何紀錄';
+    String title = '主題紀錄';
+
+    // 1. 取得目前登入者的 numId
+    final int? userNum = globals.currentUserNum;
+
+    if (userNum != null) {
+      // 2. 透過 num 取得參與者資料
+      try {
+        final Participant? participant = await globals.getParticipantByNum(userNum);
+
+        // 3. 取得分配到的主題代碼
+        final String? themeCode = participant?.giftAssignedTheme;
+
+        if (themeCode != null && themeCode.isNotEmpty) {
+          title = '您的已分配主題';
+
+          // 🎯 核心邏輯: 查找全域主題列表，將代碼轉換為名稱
+          // 假設 GiftTheme 類別有 'code' (用於比對) 和 'name' (用於顯示) 屬性
+          final List<GiftTheme> matchedThemes = globals.globalGiftThemes
+              .where((theme) => theme.code == themeCode)
+              .toList();
+
+          if (matchedThemes.isNotEmpty) {
+            // 找到了，顯示主題名稱
+            content = matchedThemes.first.name;
+          } else {
+            // 找不到對應的主題資料，顯示代碼並提示
+            content = '主題代碼：$themeCode (未在全域列表中找到對應名稱)';
+          }
+
+        }
+      } catch (e) {
+        // 處理資料庫或其他錯誤
+        content = '查詢資料時發生錯誤';
+        // 實際應用中應記錄錯誤：print('Error fetching gift status: $e');
+      }
+    }
+
+    // 4. 顯示彈窗
+    _showResultDialog(context, title, content);
+  }
+
+
+  // ----------------------------------------------------
+  // 模組 3: 底部動作區 (START 按鈕 + 結果按鈕)
   // ----------------------------------------------------
   Widget _buildAction(BuildContext context) {
     // START Button
@@ -230,7 +285,8 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       margin: const EdgeInsets.only(left: 15.0), // 留出與 START 按鈕的間距
       child: ElevatedButton(
         // 抽獎中時禁用按鈕
-        onPressed: _isDrawing ? null : () => _showResultDialog(context, _currentResult),
+        // 🎯 修改: 點擊時呼叫 _checkGiftStatus
+        onPressed: _isDrawing ? null : () => _checkGiftStatus(context),
         style: ElevatedButton.styleFrom(
           // 🎯 圓形設定
           shape: const CircleBorder(
