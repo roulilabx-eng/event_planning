@@ -123,3 +123,19 @@ class Participant {
     }
   }
 }
+
+extension ParticipantUtils on Participant {
+  // ------------------------------------------------------------
+  // 取得 participant 的 giftAssignedTheme，如果為空則返回 null
+  // ------------------------------------------------------------
+  String? getAssignedGiftTheme() {
+    return giftAssignedTheme;
+  }
+
+  // ------------------------------------------------------------
+  // 檢查 participant 是否有 giftAssignedTheme
+  // ------------------------------------------------------------
+  bool hasAssignedGift() {
+    return giftAssignedTheme != null && giftAssignedTheme!.isNotEmpty;
+  }
+}

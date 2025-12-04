@@ -87,38 +87,41 @@ class DatabaseRepository {
   /// 將 Supabase 返回的 JSON 資料轉換為 List<GiftTheme>
   // 靜態方法 2 (🔴 修正錯誤處): 獲取所有禮物主題
   // 供 SlotMachineWidget 內的 FutureBuilder 呼叫
-  static Future<List<GiftTheme>> getGiftThemes() async {
+  // lib/repositories/database_repository.dart (或 gift_theme_model.dart 中的 static 方法)
 
+  static Future<List<GiftTheme>> getGiftThemes() async {
     try {
-      // 根據 supabase_schema_plan.md，查詢 gift_themes 表格
+      // 1️⃣ 從 Supabase 取得 gift_themes 表格資料
       final response = await _supabase
           .from('gift_themes')
-          .select('id, theme_name, code')
-          .eq('is_active', true) // 只獲取啟用的主題
-          .limit(100) // 限制結果數量
+          .select('id, theme_name, code, is_active, created_at') // ✅ 必須包含 fromJson 所需欄位
+          .eq('is_active', true) // 只取啟用的主題
+          .limit(100)
           .order('theme_name', ascending: true);
 
-      // 檢查回應是否為 List<Map<String, dynamic>>
+      // 2️⃣ 確認回傳是 List
       if (response is List) {
-        // 將 Map 列表轉換為 GiftTheme 物件列表
-        return response
-            .map((map) => GiftTheme.fromJson(map as Map<String, dynamic>))
-            .toList();
+        // 將 JSON 轉 GiftTheme，單筆解析失敗也不影響其他資料
+        return response.map((map) {
+          try {
+            return GiftTheme.fromJson(map as Map<String, dynamic>);
+          } catch (e) {
+            print('Error parsing GiftTheme: $e');
+            return null; // 解析失敗回傳 null
+          }
+        }).whereType<GiftTheme>().toList(); // 過濾掉 null
       } else {
-        // 處理非預期回應格式
         throw Exception('Unexpected data format from Supabase: $response');
       }
-
     } on PostgrestException catch (e) {
-      // 處理資料庫錯誤 (例如：表格不存在、權限不足)
       print('Postgrest Error fetching gift themes: ${e.message}');
-      rethrow; // 重新拋出異常，讓 FutureBuilder 處理 hasError 狀態
+      rethrow;
     } catch (e) {
-      // 處理其他錯誤
       print('Error fetching gift themes: $e');
       rethrow;
     }
   }
+
 
   /// 從 Supabase 取得 Participant 列表
   static Future<List<Participant>> getParticipants() async {
@@ -147,6 +150,14 @@ class DatabaseRepository {
       print('Error fetching participants: $e');
       rethrow;
     }
+  }
+
+
+  /// 更新 participant 的 gift_assigned_theme 欄位
+  static Future<void> updateGiftAssignedTheme(int num, String themeCode) async {
+    // TODO: 實作資料庫更新邏輯
+    // 例如呼叫後端 API 或寫入本地資料
+    print('更新 participant $num 的 gift_assigned_theme 為 $themeCode');
   }
 
 // ----------------------------------------------------
