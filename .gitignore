@@ -1,0 +1,76 @@
+############################
+# Flutter / Dart
+############################
+**/build/
+**/.dart_tool/
+**/.packages
+pubspec.lock
+
+# Generated plugin registrant (web)
+lib/generated_plugin_registrant.dart
+
+############################
+# iOS / Xcode
+############################
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.generated/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/ephemeral/
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.xcworkspace/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xcuserstate
+
+############################
+# Android / Gradle
+############################
+android/.gradle/
+android/local.properties
+android/**/build/
+android/**/captures/
+android/**/.cxx/
+*.iml
+
+############################
+# macOS
+############################
+macos/Flutter/ephemeral/
+macos/**/build/
+
+############################
+# Web
+############################
+web/.dart_tool/
+
+############################
+# VS Code
+############################
+.vscode/
+
+############################
+# IntelliJ / Android Studio
+############################
+.idea/
+*.ipr
+*.iws
+*.iml
+
+############################
+# System files (macOS, etc.)
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# SourceTree / merge tools
+############################
+*.orig
+*.rej
+
+
