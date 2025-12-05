@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '🎄 Christmas Interactive Web',
+      title: '🎄聖誕 Ｘ 猜謎 Ｘ 交換禮物 🎄',
       theme: ThemeData(
         fontFamily: 'Arial',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
