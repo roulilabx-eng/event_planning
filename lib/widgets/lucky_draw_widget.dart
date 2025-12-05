@@ -49,7 +49,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
   }
 
   // ----------------------------------------------------
-  // 核心邏輯: 開始抽獎 (已加入資料儲存邏輯)
+  // 核心邏輯: 開始抽獎 (已移除抽獎成功後的結果彈窗)
   // ----------------------------------------------------
   void _startDraw() async {
     // 檢查是否有可用主題或是否正在抽獎
@@ -92,7 +92,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
     // 🎯 核心變更: 加入資料庫儲存邏輯
     final int? userNum = globals.currentUserNum;
     if (userNum == null) {
-      _showResultDialog(context, '錯誤', '找不到登入者資訊，無法儲存結果。');
+      _showErrorSnackbar('找不到登入者資訊，無法儲存結果。');
       return;
     }
 
@@ -104,7 +104,7 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
     final String themeCode = matchedThemes.isNotEmpty ? matchedThemes.first.code : '';
 
     if (themeCode.isEmpty) {
-      _showResultDialog(context, '錯誤', '找不到對應的主題代碼，無法儲存結果。');
+      _showErrorSnackbar('找不到對應的主題代碼，無法儲存結果。');
       return;
     }
 
@@ -113,17 +113,26 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
       // 假設 updateParticipantAssignedTheme 返回 Future<bool>
       final success = await globals.updateParticipantAssignedTheme(userNum, themeCode);
 
-      if (success != null) {
-        // 成功後顯示結果
-        _showResultDialog(context, '🎉 你的專屬主題 🎉', '$finalResult');
-      } else {
+      if (success == null) {
         // 更新失敗 (可能因為資料庫操作失敗或主題已被分配過)
-        _showResultDialog(context, '失敗', '請重新再試一次。');
+        _showErrorSnackbar('更新失敗，請重新再試一次。');
       }
+      // 🔴 [移除] 抽獎成功後不再彈出結果視窗，只讓結果顯示在 UI 上。
     } catch (e) {
       // 資料庫操作異常
-      _showResultDialog(context, '資料庫錯誤', '儲存結果時發生異常: $e');
+      _showErrorSnackbar('資料庫錯誤：儲存結果時發生異常。');
     }
+  }
+
+  // 🔴 輔助方法：顯示錯誤 Snackbar
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, textAlign: TextAlign.center),
+        backgroundColor: Colors.redAccent,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   // ----------------------------------------------------
@@ -394,8 +403,23 @@ class _LuckyDrawWidgetState extends State<LuckyDrawWidget> {
                     // 1. 標頭區塊
                     _buildTitle(),
 
-                    // 分隔線
+                    // 分隔線 (白色線)
                     const Divider(color: Colors.white, thickness: 1.5),
+
+                    // 🔴 [新增] 說明文字：不限次數抽獎，以最後一次為主
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 10.0),
+                      child: Center(
+                        child: Text(
+                          "不限次數抽獎，以最後一次為主",
+                          style: TextStyle(
+                            color: Colors.yellow,
+                            fontSize: 14, // 較小的字體大小
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
 
                     // 🎯 2. 拉霸機 UI 模組
                     _buildSlotMachine(),
